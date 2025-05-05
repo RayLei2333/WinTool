@@ -1,11 +1,8 @@
-﻿using System;
-using System.Drawing;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
 
-namespace Asjc.ShellContextMenu
+namespace Desktop
 {
     /// <summary>
     /// "Stand-alone" shell context menu
@@ -21,9 +18,6 @@ namespace Asjc.ShellContextMenu
     /// Hooking class taken from MSDN Magazine Cutting Edge column
     /// http://msdn.microsoft.com/msdnmag/issues/02/10/CuttingEdge/
     /// 
-    /// Andreas Johansson
-    /// afjohansson@hotmail.com
-    /// http://afjohansson.spaces.live.com
     /// </summary>
     /// <example>
     ///    ShellContextMenu scm = new ShellContextMenu();
@@ -31,13 +25,13 @@ namespace Asjc.ShellContextMenu
     ///    files[0] = new FileInfo(@"c:\windows\notepad.exe");
     ///    scm.ShowContextMenu(this.Handle, files, Cursor.Position);
     /// </example>
-    public class ShellContextMenu //: NativeWindow
+    public class ShellContextMenu : NativeWindow
     {
         #region Constructor
         /// <summary>Default constructor</summary>
         public ShellContextMenu()
         {
-           // this.CreateHandle(new CreateParams());
+            this.CreateHandle(new CreateParams());
         }
         #endregion
 
@@ -88,55 +82,55 @@ namespace Asjc.ShellContextMenu
         /// </summary>
         /// <param name="m">the Message of the Browser's WndProc</param>
         /// <returns>true if the message has been handled, false otherwise</returns>
-        //protected override void WndProc(ref Message m)
-        //{
-        //    #region IContextMenu
+        protected override void WndProc(ref Message m)
+        {
+            #region IContextMenu
 
-        //    if (_oContextMenu != null &&
-        //        m.Msg == (int)WM.MENUSELECT &&
-        //        ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.SEPARATOR) == 0 &&
-        //        ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.POPUP) == 0)
-        //    {
-        //        string info = string.Empty;
+            if (_oContextMenu != null &&
+                m.Msg == (int)WM.MENUSELECT &&
+                ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.SEPARATOR) == 0 &&
+                ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.POPUP) == 0)
+            {
+                string info = string.Empty;
 
-        //        if (ShellHelper.LoWord(m.WParam) == (int)CMD_CUSTOM.ExpandCollapse)
-        //            info = "Expands or collapses the current selected item";
-        //        else
-        //        {
-        //            info = "";
-        //        }
-        //    }
+                if (ShellHelper.LoWord(m.WParam) == (int)CMD_CUSTOM.ExpandCollapse)
+                    info = "Expands or collapses the current selected item";
+                else
+                {
+                    info = "";
+                }
+            }
 
-        //    #endregion
+            #endregion
 
-        //    #region IContextMenu2
+            #region IContextMenu2
 
-        //    if (_oContextMenu2 != null &&
-        //        (m.Msg == (int)WM.INITMENUPOPUP ||
-        //         m.Msg == (int)WM.MEASUREITEM ||
-        //         m.Msg == (int)WM.DRAWITEM))
-        //    {
-        //        if (_oContextMenu2.HandleMenuMsg(
-        //            (uint)m.Msg, m.WParam, m.LParam) == S_OK)
-        //            return;
-        //    }
+            if (_oContextMenu2 != null &&
+                (m.Msg == (int)WM.INITMENUPOPUP ||
+                 m.Msg == (int)WM.MEASUREITEM ||
+                 m.Msg == (int)WM.DRAWITEM))
+            {
+                if (_oContextMenu2.HandleMenuMsg(
+                    (uint)m.Msg, m.WParam, m.LParam) == S_OK)
+                    return;
+            }
 
-        //    #endregion
+            #endregion
 
-        //    #region IContextMenu3
+            #region IContextMenu3
 
-        //    if (_oContextMenu3 != null &&
-        //        m.Msg == (int)WM.MENUCHAR)
-        //    {
-        //        if (_oContextMenu3.HandleMenuMsg2(
-        //            (uint)m.Msg, m.WParam, m.LParam, IntPtr.Zero) == S_OK)
-        //            return;
-        //    }
+            if (_oContextMenu3 != null &&
+                m.Msg == (int)WM.MENUCHAR)
+            {
+                if (_oContextMenu3.HandleMenuMsg2(
+                    (uint)m.Msg, m.WParam, m.LParam, IntPtr.Zero) == S_OK)
+                    return;
+            }
 
-        //    #endregion
+            #endregion
 
-        //    base.WndProc(ref m);
-        //}
+            base.WndProc(ref m);
+        }
 
         #endregion
 
@@ -163,7 +157,7 @@ namespace Asjc.ShellContextMenu
         /// <summary>
         /// Release all allocated interfaces, PIDLs 
         /// </summary>
-        private void ReleaseAll()
+        public void ReleaseAll()
         {
             if (null != _oContextMenu)
             {
@@ -203,7 +197,7 @@ namespace Asjc.ShellContextMenu
         /// Gets the desktop folder
         /// </summary>
         /// <returns>IShellFolder for desktop folder</returns>
-        private IShellFolder GetDesktopFolder()
+        public IShellFolder GetDesktopFolder()
         {
             IntPtr pUnkownDesktopFolder = IntPtr.Zero;
 
@@ -439,12 +433,12 @@ namespace Asjc.ShellContextMenu
         /// </summary>
         /// <param name="files">FileInfos (should all be in same directory)</param>
         /// <param name="pointScreen">Where to show the menu</param>
-        public void ShowContextMenu(FileInfo[] files, Point pointScreen, IntPtr hWnd)
+        public void ShowContextMenu(FileInfo[] files, Point pointScreen)
         {
             // Release all resources first.
             ReleaseAll();
             _arrPIDLs = GetPIDLs(files);
-            this.ShowContextMenu(pointScreen,hWnd);
+            this.ShowContextMenu(pointScreen);
         }
 
         /// <summary>
@@ -452,12 +446,12 @@ namespace Asjc.ShellContextMenu
         /// </summary>
         /// <param name="dirs">DirectoryInfos (should all be in same directory)</param>
         /// <param name="pointScreen">Where to show the menu</param>
-        public void ShowContextMenu(DirectoryInfo[] dirs, Point pointScreen, IntPtr hWnd)
+        public void ShowContextMenu(DirectoryInfo[] dirs, Point pointScreen)
         {
             // Release all resources first.
             ReleaseAll();
             _arrPIDLs = GetPIDLs(dirs);
-            this.ShowContextMenu(pointScreen, hWnd);
+            this.ShowContextMenu(pointScreen);
         }
 
         /// <summary>
@@ -465,7 +459,7 @@ namespace Asjc.ShellContextMenu
         /// </summary>
         /// <param name="arrFI">FileInfos (should all be in same directory)</param>
         /// <param name="pointScreen">Where to show the menu</param>
-        private void ShowContextMenu(Point pointScreen,IntPtr hWnd)
+        private void ShowContextMenu(Point pointScreen)
         {
             IntPtr pMenu = IntPtr.Zero,
                 iContextMenuPtr = IntPtr.Zero,
@@ -508,7 +502,7 @@ namespace Asjc.ShellContextMenu
                     TPM.RETURNCMD,
                     pointScreen.X,
                     pointScreen.Y,
-                    hWnd,
+                    this.Handle,
                     IntPtr.Zero);
 
                 if (nSelected != 0)
@@ -716,7 +710,7 @@ namespace Asjc.ShellContextMenu
         // Defines the values used with the IShellFolder::GetDisplayNameOf and IShellFolder::SetNameOf 
         // methods to specify the type of file or folder names used by those methods
         [Flags]
-        private enum SHGNO
+        public enum SHGNO
         {
             NORMAL = 0x0000,
             INFOLDER = 0x0001,
@@ -727,7 +721,7 @@ namespace Asjc.ShellContextMenu
 
         // The attributes that the caller is requesting, when calling IShellFolder::GetAttributesOf
         [Flags]
-        private enum SFGAO : uint
+        public enum SFGAO : uint
         {
             BROWSABLE = 0x8000000,
             CANCOPY = 1,
@@ -767,7 +761,7 @@ namespace Asjc.ShellContextMenu
         // Determines the type of items included in an enumeration. 
         // These values are used with the IShellFolder::EnumObjects method
         [Flags]
-        private enum SHCONTF
+        public enum SHCONTF
         {
             FOLDERS = 0x0020,
             NONFOLDERS = 0x0040,
@@ -1156,7 +1150,7 @@ namespace Asjc.ShellContextMenu
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         [Guid("000214E6-0000-0000-C000-000000000046")]
-        private interface IShellFolder
+        public interface IShellFolder
         {
             // Translates a file object's or folder's display name into an item identifier list.
             // Return value: error code, if any
@@ -1165,7 +1159,7 @@ namespace Asjc.ShellContextMenu
                 IntPtr hwnd,
                 IntPtr pbc,
                 [MarshalAs(UnmanagedType.LPWStr)]
-            string pszDisplayName,
+                string pszDisplayName,
                 ref uint pchEaten,
                 out IntPtr ppidl,
                 ref SFGAO pdwAttributes);
@@ -1228,7 +1222,7 @@ namespace Asjc.ShellContextMenu
             Int32 GetAttributesOf(
                 uint cidl,
                 [MarshalAs(UnmanagedType.LPArray)]
-            IntPtr[] apidl,
+                IntPtr[] apidl,
                 ref SFGAO rgfInOut);
 
             // Retrieves an OLE interface that can be used to carry out actions on the
@@ -1239,7 +1233,7 @@ namespace Asjc.ShellContextMenu
                 IntPtr hwndOwner,
                 uint cidl,
                 [MarshalAs(UnmanagedType.LPArray)]
-            IntPtr[] apidl,
+                IntPtr[] apidl,
                 ref Guid riid,
                 IntPtr rgfReserved,
                 out IntPtr ppv);
@@ -1260,7 +1254,7 @@ namespace Asjc.ShellContextMenu
                 IntPtr hwnd,
                 IntPtr pidl,
                 [MarshalAs(UnmanagedType.LPWStr)]
-            string pszName,
+                string pszName,
                 SHGNO uFlags,
                 out IntPtr ppidlOut);
         }
@@ -1295,7 +1289,7 @@ namespace Asjc.ShellContextMenu
                 GCS uflags,
                 uint reserved,
                 [MarshalAs(UnmanagedType.LPArray)]
-            byte[] commandstring,
+                byte[] commandstring,
                 int cch);
         }
 
@@ -1326,7 +1320,7 @@ namespace Asjc.ShellContextMenu
                 GCS uflags,
                 uint reserved,
                 [MarshalAs(UnmanagedType.LPWStr)]
-            StringBuilder commandstring,
+                StringBuilder commandstring,
                 int cch);
 
             // Allows client objects of the IContextMenu interface to 
@@ -1365,7 +1359,7 @@ namespace Asjc.ShellContextMenu
                 GCS uflags,
                 uint reserved,
                 [MarshalAs(UnmanagedType.LPWStr)]
-            StringBuilder commandstring,
+                StringBuilder commandstring,
                 int cch);
 
             // Allows client objects of the IContextMenu interface to 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -10,30 +11,78 @@ namespace ConsoleApp1
     {
 
         // Win32 API 导入
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-        [DllImport("user32.dll")]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-        private const int GWL_EXSTYLE = -20;
-        private const int WS_EX_TOPMOST = 0x00000008;
-        private const int WS_EX_NOACTIVATE = 0x08000000;
+        //[DllImport("user32.dll")]
+        //private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        //[DllImport("user32.dll")]
+        //private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        //private const int GWL_EXSTYLE = -20;
+        //private const int WS_EX_TOPMOST = 0x00000008;
+        //private const int WS_EX_NOACTIVATE = 0x08000000;
 
 
         static void Main(string[] args)
         {
+            bool checkDisk = true;
+            using (Icon ico = IconExtractor6.GetIcon16(".txt", false))
+            {
+                // save to file (or show in a picture box)
+                //"C:\Users\10475\Desktop\test"
+                ico.ToBitmap().Save("C:\\Users\\10475\\Desktop\\test\\txticon_s.png", ImageFormat.Png);
+            }
+            //IntPtr hIcon = IconExtractor6.GetJumboIcon(IconExtractor6.GetIconIndex("C:\\Users\\10475\\Desktop\\test", checkDisk));
+            //// from native to managed
+            //using (Icon ico = (Icon)System.Drawing.Icon.FromHandle(hIcon).Clone())
+            //{
+            //    // save to file (or show in a picture box)
+            //    //"C:\Users\10475\Desktop\test"
+            //    ico.ToBitmap().Save("C:\\Users\\10475\\Desktop\\test\\txticon_jumbo.png", ImageFormat.Png);
+            //}
+            //IconExtractor6.DestroyIcon(hIcon); // don't forget to cleanup
+
+            //IntPtr xlIcon = IconExtractor6.GetXLIcon(IconExtractor6.GetIconIndex(".txt", false));
+            //// from native to managed
+            //using (Icon ico = (Icon)System.Drawing.Icon.FromHandle(xlIcon).Clone())
+            //{
+            //    // save to file (or show in a picture box)
+            //    //"C:\Users\10475\Desktop\test"
+            //    ico.ToBitmap().Save("C:\\Users\\10475\\Desktop\\test\\txticon_xl.png", ImageFormat.Png);
+            //}
+            //IconExtractor6.DestroyIcon(xlIcon); // don't forget to cleanup
+
+            //IntPtr lIcon = IconExtractor6.GetLIcon(IconExtractor6.GetIconIndex("*.txt", checkDisk));
+            //// from native to managed
+            //using (Icon ico = (Icon)System.Drawing.Icon.FromHandle(lIcon).Clone())
+            //{
+            //    // save to file (or show in a picture box)
+            //    //"C:\Users\10475\Desktop\test"
+            //    ico.ToBitmap().Save("C:\\Users\\10475\\Desktop\\test\\txticon_l.png", ImageFormat.Png);
+            //}
+            //IconExtractor6.DestroyIcon(lIcon); // don't forget to cleanup
+
+            //IntPtr sIcon = IconExtractor6.GetSIcon(IconExtractor6.GetIconIndex("*.txt", checkDisk));
+            //// from native to managed
+            //using (Icon ico = (Icon)System.Drawing.Icon.FromHandle(sIcon).Clone())
+            //{
+            //    // save to file (or show in a picture box)
+            //    //"C:\Users\10475\Desktop\test"
+            //    ico.ToBitmap().Save("C:\\Users\\10475\\Desktop\\test\\txticon_s.png", ImageFormat.Png);
+            //}
+            //IconExtractor6.DestroyIcon(sIcon); // don't forget to cleanup
+
+
             Console.WriteLine("Hello, World!");
 
-            IntPtr hwnd = Process.GetCurrentProcess().MainWindowHandle;
-            int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-            SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOPMOST | WS_EX_NOACTIVATE);
-            Console.WriteLine("窗口已设置为免疫显示桌面");
+            //IntPtr hwnd = Process.GetCurrentProcess().MainWindowHandle;
+            //int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            //SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOPMOST | WS_EX_NOACTIVATE);
+            //Console.WriteLine("窗口已设置为免疫显示桌面");
             //Console.ReadKey(); // 保持控制台窗口打开，查看效果
 
             // 使用示例：
             //string folderPath = @"D:\\";
             //string filePath = @"D:\\123123.jpg";
             //ShellContextMenu scm = new ShellContextMenu();
-            //scm.ShowContextMenu(new string[] { filePath }, new Point(0,0));
+            //scm.ShowContextMenu(new string[] { filePath }, new Point(0, 0));
             //e.Handled = true;
 
 
