@@ -537,6 +537,40 @@ namespace Desktop
                 ReleaseAll();
             }
         }
+
+        /// <summary>
+        /// show desktop context menu
+        /// </summary>
+        /// <param name="pointScreen">Where to show the menu</param>
+        public void ShowDesktopContextMenu(Point pointScreen)
+        {
+            IntPtr progmanHwnd = FindWindow("Progman", null);
+            IntPtr workerwHwnd = IntPtr.Zero;
+            IntPtr shellViewHwnd = IntPtr.Zero;
+
+            // 查找 WorkerW 窗口
+            do
+            {
+                workerwHwnd = FindWindowEx(IntPtr.Zero, workerwHwnd, "WorkerW", null);
+                if (workerwHwnd != IntPtr.Zero)
+                {
+                    shellViewHwnd = FindWindowEx(workerwHwnd, IntPtr.Zero, "SHELLDLL_DefView", null);
+                    if (shellViewHwnd != IntPtr.Zero)
+                    {
+                        break;
+                    }
+                }
+            } while (workerwHwnd != IntPtr.Zero);
+
+            if (shellViewHwnd != IntPtr.Zero)
+            {
+                // 组合 x 和 y 坐标到 lParam
+                IntPtr lParam = (IntPtr)((pointScreen.Y << 16) | pointScreen.X);
+
+                PostMessage(shellViewHwnd, WM_CONTEXTMENU, IntPtr.Zero, lParam);
+            }
+        }
+
         #endregion
 
         #region Local variabled
@@ -561,6 +595,7 @@ namespace Desktop
         private static int cbMenuItemInfo = Marshal.SizeOf(typeof(MENUITEMINFO));
         private static int cbInvokeCommand = Marshal.SizeOf(typeof(CMINVOKECOMMANDINFOEX));
 
+        private const uint WM_CONTEXTMENU = 0x007B;
         #endregion
 
         #region DLL Import
@@ -588,6 +623,15 @@ namespace Desktop
         // Determines the default menu item on the specified menu
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Auto)]
         private static extern int GetMenuDefaultItem(IntPtr hMenu, bool fByPos, uint gmdiFlags);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+
+        [DllImport("user32.dll")]
+        private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         #endregion
 

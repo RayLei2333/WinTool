@@ -61,10 +61,11 @@ namespace Desktop
             //DirectoryInfo[] arrFI = [new DirectoryInfo(path)];
             //_ctxMnu.ShowContextMenu(arrFI, new System.Drawing.Point(100, 100));
 
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            FileInfo[] files = new FileInfo[1];
-            files[0] = new FileInfo(desktopPath);
+            //string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            //FileInfo[] files = new FileInfo[1];
+            //files[0] = new FileInfo(desktopPath);
 
+            _ctxMnu.ShowDesktopContextMenu(new System.Drawing.Point(100,100));
 
 
         }
