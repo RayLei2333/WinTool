@@ -66,7 +66,7 @@ namespace Desktop
             //Activated += OnActivated;
         }
 
-        private void OnActivated(object? sender, EventArgs e)
+        private void OnActivated(object sender, EventArgs e)
         {
             _desktopWindow.UpdateDesktopWindow(new WindowInteropHelper(this).Handle);
         }

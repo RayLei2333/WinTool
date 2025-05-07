@@ -12,7 +12,7 @@ namespace Desktop
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         #region Event
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
         #region Porperty
