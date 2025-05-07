@@ -8,12 +8,14 @@
         Title="MainWindow" 
         Height="450" 
         Width="800"  
-        WindowStyle="None" 
+       
         BorderThickness="0" 
-        AllowsTransparency="True"
+       
         WindowStartupLocation="CenterScreen" 
-        Background="{Binding BackgroundImage}">
+        >
+    <!--WindowStyle="None"   AllowsTransparency="True"  Background="{Binding BackgroundImage}"-->
     <Grid>
-        <Button Click="Button_Click">aaa</Button>
+        <!--<Button Click="Button_Click">aaa</Button>-->
+        <TextBlock x:Name="logs"></TextBlock>
     </Grid>
 </Window>
