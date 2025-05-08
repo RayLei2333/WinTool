@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Desktop.Views;
 using System.IO;
-using System.Net.NetworkInformation;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,23 +19,22 @@ namespace Desktop
     /// </summary>
     public partial class MainWindow : Window
     {
-        //private IntPtr _shellViewPtr = IntPtr.Zero;
         private ShellContextMenu _ctxMnu = new();
         private DesktopWindow _desktopWindow = new();
-        public MainWindowViewModel ViewModel = new MainWindowViewModel();
-        //private FileChangeWatcher _fileChangeWatcher;
-        //private UIHelper _uiHelper = new();
         private FileSystemWatcher _fileSystemWatcher = new();
+        public MainWindowViewModel ViewModel = new MainWindowViewModel();
+
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = ViewModel;
+            //init block
+            foreach (var item in ViewModel.Blocks)
+            {
+                BlockItem block = new BlockItem(item, ViewModel);
+                wrapper.Children.Add(block);
+            }
 
-           // this.DataContext = ViewModel;
-            
-            
-            //string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            //_fileChangeWatcher = new FileChangeWatcher(new WindowInteropHelper(this).Handle, desktopPath);
-            //_fileChangeWatcher.FileCreated += OnFileCreated;
 
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             // 设置要监听的文件夹路径
@@ -60,25 +56,18 @@ namespace Desktop
             Closed += (sender, e) => _fileSystemWatcher.Dispose();
             //SystemParameters.PrimaryScreenHeight 包含任务栏高度 
             //SystemParameters.PrimaryScreenWidth  
-            //Width = SystemParameters.WorkArea.Width;
-            //Height = SystemParameters.WorkArea.Height;
+            Width = SystemParameters.WorkArea.Width;
+            Height = SystemParameters.WorkArea.Height;
 
             //Activated += OnActivated;
+
+
         }
 
         private void OnActivated(object sender, EventArgs e)
         {
             _desktopWindow.UpdateDesktopWindow(new WindowInteropHelper(this).Handle);
         }
-
-        private void Init()
-        {
-
-        }
-
-
-        //监听桌面路径
-
 
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -95,26 +84,5 @@ namespace Desktop
 
             _ctxMnu.ShowDesktopContextMenu(new System.Drawing.Point(100, 100));
         }
-
-        //private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        //{
-        //const int WM_SHNOTIFY = 0x0401;
-        //const uint SHCNE_CREATE = 0x00000004;
-
-        //if (msg == WM_SHNOTIFY)
-        //{
-        //    uint eventCode = (uint)wParam.ToInt32();
-        //    if (eventCode == SHCNE_CREATE)
-        //    {
-        //        _fileChangeWatcher.HandleFileChangeMessage(lParam);
-        //        handled = true;
-        //    }
-        //}
-
-        //return IntPtr.Zero;
-        //   }
-
-     
-
     }
 }

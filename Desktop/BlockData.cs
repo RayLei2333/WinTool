@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Desktop
 {
-    class BlockData
+    public class BlockData
     {
+        public string Id { get; set; }
+
         /// <summary>
         /// X
         /// </summary>
@@ -28,6 +30,8 @@ namespace Desktop
         /// </summary>
         public int Height { get; set; }
 
+        public string Name { get; set; }
+
         /// <summary>
         /// 是否锁定状态
         /// </summary>
@@ -38,6 +42,11 @@ namespace Desktop
         /// </summary>
         public ViewType ViewType { get; set; }
 
-        //MyProperty { get; set; }
+        /// <summary>
+        /// 文件列表
+        /// </summary>
+        public List<string> FilePathList { get; set; }
+
+
     }
 }

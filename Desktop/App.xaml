@@ -1,11 +1,10 @@
-﻿<Application x:Class="Descktop.App"
+﻿<Application x:Class="Desktop.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Descktop"
+             xmlns:local="clr-namespace:Desktop"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <!-- 定义全局字体资源 -->
-        <FontFamily x:Key="IconFont">pack://application:,,,/res/#iconfont</FontFamily>
-        <!--<FontFamily x:Key="IconFont">pack://application:,,,/res#iconfont</FontFamily>-->
+        <FontFamily x:Key="IconFont">pack://application:,,,/Desktop;component/res/#iconfont</FontFamily>
     </Application.Resources>
 </Application>

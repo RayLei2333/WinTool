@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Desktop
 {
-    enum ViewType
+    public enum ViewType
     {
         /// <summary>
         /// 列表视图

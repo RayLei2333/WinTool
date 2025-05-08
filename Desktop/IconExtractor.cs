@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -29,13 +30,13 @@ namespace Desktop
         extern static int SHGetImageList(int iImageList, ref Guid riid, ref IImageList ppv);
 
         [DllImport("user32.dll", EntryPoint = "DestroyIcon", SetLastError = true)]
-        static extern int DestroyIcon(IntPtr hIcon);
+        static extern int DestroyIcon(nint hIcon);
 
         [DllImport("shell32.dll")]
-        static extern uint SHGetIDListFromObject([MarshalAs(UnmanagedType.IUnknown)] object iUnknown, out IntPtr ppidl);
+        static extern uint SHGetIDListFromObject([MarshalAs(UnmanagedType.IUnknown)] object iUnknown, out nint ppidl);
 
         [DllImport("Shell32.dll")]
-        static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbFileInfo, uint uFlags);
+        static extern nint SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbFileInfo, uint uFlags);
 
         #endregion
 
@@ -53,7 +54,7 @@ namespace Desktop
             uint flags = (uint)(SHGFI.SysIconIndex | SHGFI.LargeIcon);
             if (!checkDisk)
                 flags |= (uint)SHGFI.UseFileAttributes;
-            SHGetFileInfo(pszFile, 0, ref sfi, (uint)System.Runtime.InteropServices.Marshal.SizeOf(sfi), flags);
+            SHGetFileInfo(pszFile, 0, ref sfi, (uint)Marshal.SizeOf(sfi), flags);
             return sfi.iIcon;
         }
 
@@ -120,14 +121,14 @@ namespace Desktop
             Guid guil = new Guid(IID_IImageList);//or IID_IImageList
 
             SHGetImageList(iImageList, ref guil, ref spiml);
-            IntPtr hIcon = IntPtr.Zero;
+            nint hIcon = nint.Zero;
             spiml.GetIcon(iImage, ILD_TRANSPARENT | ILD_IMAGE, ref hIcon); //
             return ToIcon(hIcon);
         }
 
         private static Icon ToIcon(nint hIcon)
         {
-            Icon ico = (Icon)System.Drawing.Icon.FromHandle(hIcon).Clone();
+            Icon ico = (Icon)Icon.FromHandle(hIcon).Clone();
             DestroyIcon(hIcon);
             return ico;
 
@@ -182,7 +183,7 @@ namespace Desktop
         public struct SHFILEINFO
         {
             public const int NAMESIZE = 80;
-            public IntPtr hIcon;
+            public nint hIcon;
             public int iIcon;
             public uint dwAttributes;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
@@ -209,9 +210,9 @@ namespace Desktop
         public struct IMAGELISTDRAWPARAMS
         {
             public int cbSize;
-            public IntPtr himl;
+            public nint himl;
             public int i;
-            public IntPtr hdcDst;
+            public nint hdcDst;
             public int x;
             public int y;
             public int cx;
@@ -230,8 +231,8 @@ namespace Desktop
         [StructLayout(LayoutKind.Sequential)]
         public struct IMAGEINFO
         {
-            public IntPtr hbmImage;
-            public IntPtr hbmMask;
+            public nint hbmImage;
+            public nint hbmMask;
             public int Unused1;
             public int Unused2;
             public RECT rcImage;
@@ -239,21 +240,21 @@ namespace Desktop
         #endregion
 
         #region IImageList
-        [ComImportAttribute()]
-        [GuidAttribute("46EB5926-582E-4017-9FDF-E8998DAA0950")]
-        [InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
+        [ComImport()]
+        [Guid("46EB5926-582E-4017-9FDF-E8998DAA0950")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         public interface IImageList
         {
             [PreserveSig]
             int Add(
-            IntPtr hbmImage,
-            IntPtr hbmMask,
+            nint hbmImage,
+            nint hbmMask,
             ref int pi);
 
             [PreserveSig]
             int ReplaceIcon(
             int i,
-            IntPtr hicon,
+            nint hicon,
             ref int pi);
 
             [PreserveSig]
@@ -264,12 +265,12 @@ namespace Desktop
             [PreserveSig]
             int Replace(
             int i,
-            IntPtr hbmImage,
-            IntPtr hbmMask);
+            nint hbmImage,
+            nint hbmMask);
 
             [PreserveSig]
             int AddMasked(
-            IntPtr hbmImage,
+            nint hbmImage,
             int crMask,
             ref int pi);
 
@@ -285,7 +286,7 @@ namespace Desktop
             int GetIcon(
             int i,
             int flags,
-            ref IntPtr picon);
+            ref nint picon);
 
             [PreserveSig]
             int GetImageInfo(
@@ -307,12 +308,12 @@ namespace Desktop
             int dx,
             int dy,
             ref Guid riid,
-            ref IntPtr ppv);
+            ref nint ppv);
 
             [PreserveSig]
             int Clone(
             ref Guid riid,
-            ref IntPtr ppv);
+            ref nint ppv);
 
             [PreserveSig]
             int GetImageRect(
@@ -357,13 +358,13 @@ namespace Desktop
 
             [PreserveSig]
             int DragEnter(
-            IntPtr hwndLock,
+            nint hwndLock,
             int x,
             int y);
 
             [PreserveSig]
             int DragLeave(
-            IntPtr hwndLock);
+            nint hwndLock);
 
             [PreserveSig]
             int DragMove(
@@ -386,7 +387,7 @@ namespace Desktop
             ref POINT ppt,
             ref POINT pptHotspot,
             ref Guid riid,
-            ref IntPtr ppv);
+            ref nint ppv);
 
             [PreserveSig]
             int GetItemFlags(

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Collections.ObjectModel;
 
 namespace Desktop
 {
@@ -17,7 +18,6 @@ namespace Desktop
 
         #region Porperty
         private System.Windows.Media.Brush _backgroundImage;
-
         public System.Windows.Media.Brush BackgroundImage
         {
             get { return _backgroundImage; }
@@ -28,11 +28,16 @@ namespace Desktop
             }
         }
 
+        private BlockManager _blockManager = BlockManager.Instence;
+
+        public List<BlockData> Blocks { get { return _blockManager.BlockData; } }
+
         #endregion
 
 
         public MainWindowViewModel()
         {
+            //设置壁纸
             string wallPaperPath = DesktopWindow.GetDesktopWallpaperPath();
             if (string.IsNullOrEmpty(wallPaperPath))
                 BackgroundImage = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0));
@@ -41,6 +46,18 @@ namespace Desktop
                 {
                     ImageSource = new BitmapImage(new Uri(wallPaperPath))
                 };
+
+
+            //填充默认块
+            if (!Blocks.Any())
+            {
+                _blockManager.AddBlock(100, "测试块1");
+            }
+        }
+
+        public void SaveData()
+        {
+            _blockManager.Save();
         }
     }
 }
