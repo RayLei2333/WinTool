@@ -43,6 +43,9 @@ namespace Desktop
                 wrapper.Children.Add(block);
             }
 
+            //DragSizeControl dragSizeControl = new DragSizeControl();
+            //wrapper.Children.Add(dragSizeControl);
+
 
             //string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             //// 设置要监听的文件夹路径

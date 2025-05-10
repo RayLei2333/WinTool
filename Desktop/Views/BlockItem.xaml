@@ -12,6 +12,8 @@
              Width="{Binding Data.Width}"
              Height="{Binding Data.Height}"
              Margin="{Binding BlockItemMargin}"
+             MinWidth="300"
+             MaxHeight="{Binding MaxHeight}"
              x:Name="BlockItemControl">
     <UserControl.Resources>
         <converts:ValueEqualsConverter x:Key="ValueEqualsConverter" />
@@ -53,79 +55,109 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        
+
     </UserControl.Resources>
     <Grid x:Name="grid" Background="#000">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-        </Grid.RowDefinitions>
-        <!--PreviewMouseDown="title_MouseDown" PreviewMouseMove="title_MouseMove" PreviewMouseUp="title_MouseUp"-->
-        <Grid Grid.Row="0" x:Name="title" Background="Transparent" >
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="PreviewMouseDown">
-                    <i:InvokeCommandAction Command="{Binding TitleMouseDownCommand}" PassEventArgsToCommand="True"></i:InvokeCommandAction>
-                </i:EventTrigger>
-                <i:EventTrigger EventName="PreviewMouseMove">
-                    <i:InvokeCommandAction Command="{Binding TitleMouseMoveCommand}" PassEventArgsToCommand="True"></i:InvokeCommandAction>
-                </i:EventTrigger>
-                <i:EventTrigger EventName="PreviewMouseUp">
-                    <i:InvokeCommandAction Command="{Binding TitleMouseUpCommand}" PassEventArgsToCommand="True"></i:InvokeCommandAction>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-
-            <Button Style="{StaticResource LockButton}" HorizontalAlignment="Left" >
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click">
-                        <i:InvokeCommandAction Command="{Binding LockButtonClickCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Button>
-            <TextBox Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TopBarTextBox}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                        <i:InvokeCommandAction Command="{Binding TitleDoubleClickCommand}"  PassEventArgsToCommand="True" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="KeyUp">
-                        <i:InvokeCommandAction Command="{Binding TitleKeyUpCommand}" PassEventArgsToCommand="True"></i:InvokeCommandAction>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </TextBox>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="MenuButton" Style="{StaticResource TopBarButton}" Content="&#xe601;" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="31"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <!--PreviewMouseDown="title_MouseDown" PreviewMouseMove="title_MouseMove" PreviewMouseUp="title_MouseUp"-->
+            <Border Grid.Row="0" BorderBrush="Gray" BorderThickness="0,0,0,1" >
+                <Grid x:Name="title" Background="Transparent">
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <i:InvokeCommandAction Command="{Binding ViewTypeClickCommand}" PassEventArgsToCommand="True" />
+                        <i:EventTrigger EventName="PreviewMouseDown">
+                            <i:InvokeCommandAction Command="{Binding TitleMouseDownCommand}" PassEventArgsToCommand="True"></i:InvokeCommandAction>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewMouseMove">
+                            <i:InvokeCommandAction Command="{Binding TitleMouseMoveCommand}" PassEventArgsToCommand="True"></i:InvokeCommandAction>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewMouseUp">
+                            <i:InvokeCommandAction Command="{Binding TitleMouseUpCommand}" PassEventArgsToCommand="True"></i:InvokeCommandAction>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                    <!--设置菜单项为可勾选-->
-                    <Button.ContextMenu>
-                        <ContextMenu x:Name="MenuContextMenu">
-                            <MenuItem Header="列表显示" IsCheckable="True" IsChecked="{Binding ViewType,Converter={StaticResource ValueEqualsConverter},ConverterParameter=1}" Tag="1" >
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <MenuItem Header="小图标显示" IsCheckable="True" IsChecked="{Binding ViewType, Converter={StaticResource ValueEqualsConverter}, ConverterParameter=2}" Tag="2">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <MenuItem Header="大图标显示" IsCheckable="True" IsChecked="{Binding ViewType, Converter={StaticResource ValueEqualsConverter}, ConverterParameter=3}" Tag="3">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                        </ContextMenu>
-                    </Button.ContextMenu>
-                </Button>
-            </StackPanel>
+
+                    <Button Style="{StaticResource LockButton}" HorizontalAlignment="Left" >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <i:InvokeCommandAction Command="{Binding LockButtonClickCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                    <TextBox Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TopBarTextBox}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="PreviewMouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding TitleDoubleClickCommand}"  PassEventArgsToCommand="True" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="KeyUp">
+                                <i:InvokeCommandAction Command="{Binding TitleKeyUpCommand}" PassEventArgsToCommand="True"></i:InvokeCommandAction>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="MenuButton" Style="{StaticResource TopBarButton}" Content="&#xe601;" >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <i:InvokeCommandAction Command="{Binding ViewTypeClickCommand}" PassEventArgsToCommand="True" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <!--设置菜单项为可勾选-->
+                            <Button.ContextMenu>
+                                <ContextMenu x:Name="MenuContextMenu">
+                                    <MenuItem Header="列表显示" IsCheckable="True" IsChecked="{Binding ViewType,Converter={StaticResource ValueEqualsConverter},ConverterParameter=1}" Tag="1" >
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Click">
+                                                <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </MenuItem>
+                                    <MenuItem Header="小图标显示" IsCheckable="True" IsChecked="{Binding ViewType, Converter={StaticResource ValueEqualsConverter}, ConverterParameter=2}" Tag="2">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Click">
+                                                <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </MenuItem>
+                                    <MenuItem Header="大图标显示" IsCheckable="True" IsChecked="{Binding ViewType, Converter={StaticResource ValueEqualsConverter}, ConverterParameter=3}" Tag="3">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Click">
+                                                <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                        </Button>
+                    </StackPanel>
+
+                </Grid>
+            </Border>
         </Grid>
+
+        <!-- 上边缘 -->
+        <Thumb Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="SizeNS" DragDelta="TopThumb_DragDelta" DragCompleted="Thumb_DragCompleted"/>
+
+        <!-- 下边缘 -->
+        <Thumb Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS" DragDelta="BottomThumb_DragDelta" DragCompleted="Thumb_DragCompleted"/>
+
+        <!-- 左边缘 -->
+        <Thumb Width="5" HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" DragDelta="LeftThumb_DragDelta" DragCompleted="Thumb_DragCompleted"/>
+
+
+        <!-- 右边缘 -->
+        <Thumb Width="5" HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE" DragDelta="RightThumb_DragDelta" DragCompleted="Thumb_DragCompleted"/>
+
+        <!-- 左上角 -->
+        <Thumb Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" DragDelta="TopLeftThumb_DragDelta" DragCompleted="Thumb_DragCompleted"/>
+
+        <!-- 右上角 -->
+        <Thumb Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" DragDelta="TopRightThumb_DragDelta" DragCompleted="Thumb_DragCompleted"/>
+
+        <!-- 左下角 -->
+        <Thumb Width="10" Height="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" DragDelta="BottomLeftThumb_DragDelta" DragCompleted="Thumb_DragCompleted"/>
+
+        <!-- 右下角 -->
+        <Thumb Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" DragDelta="BottomRightThumb_DragDelta" DragCompleted="Thumb_DragCompleted"/>
     </Grid>
 </UserControl>

@@ -56,6 +56,14 @@ namespace Desktop.Views
             }
         }
 
+
+        public double MaxHeight
+        {
+            get { return SystemParameters.WorkArea.Height; }
+
+        }
+
+
         /// <summary>
         /// 是否锁定状态
         /// </summary>
@@ -257,6 +265,11 @@ namespace Desktop.Views
         }
         #endregion
 
-
+        public void SetBlockSize(double width, double height)
+        {
+            Data.Width = width;
+            Data.Height = height;
+            JustSaveEvent?.Invoke(this, new JustSaveEventArgs());
+        }
     }
 }

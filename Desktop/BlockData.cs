@@ -23,12 +23,12 @@ namespace Desktop
         /// <summary>
         /// 块宽度
         /// </summary>
-        public int Width { get; set; }
+        public double Width { get; set; }
 
         /// <summary>
         /// 块高度
         /// </summary>
-        public int Height { get; set; }
+        public double Height { get; set; }
 
         public string Name { get; set; }
 

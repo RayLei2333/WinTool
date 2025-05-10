@@ -6,5 +6,16 @@
     <Application.Resources>
         <!-- 定义全局字体资源 -->
         <FontFamily x:Key="IconFont">pack://application:,,,/Desktop;component/res/#iconfont</FontFamily>
+
+        <Style TargetType="Thumb">
+            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Rectangle Fill="Transparent"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>
