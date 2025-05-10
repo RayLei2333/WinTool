@@ -4,20 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Desktop"
+        xmlns:converts="clr-namespace:Desktop.Converters" 
         mc:Ignorable="d"
         Title="MainWindow"
         Height="450" 
         Width="800"
         BorderThickness="0" 
-
+        WindowStyle="None"   
+        AllowsTransparency="True" 
+        Background="{Binding BackgroundImage}"
         WindowStartupLocation="CenterScreen" 
         x:Name="mainWindow"
         >
     <!--WindowStyle="None"   AllowsTransparency="True"  Background="{Binding BackgroundImage}"-->
     <!--<Grid x:Name="grid">-->
-    <!--<Button Click="Button_Click">aaa</Button>-->
     <!--<TextBlock x:Name="logs"></TextBlock>-->
     <!--</Grid>-->
+    <!--<Button Click="Button_Click">aaa</Button>-->
+    <Window.Resources>
+        <converts:ValueEqualsConverter x:Key="ValueEqualsConverter"></converts:ValueEqualsConverter>
+    </Window.Resources>
     <WrapPanel x:Name="wrapper">
 
     </WrapPanel>

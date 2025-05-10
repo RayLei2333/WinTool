@@ -34,7 +34,7 @@ namespace Desktop
         /// 查找桌面窗体
         /// </summary>
         /// <returns></returns>
-        private static nint FindDescktopWindow()
+        public static nint FindDescktopWindow()
         {
             nint descktopPtr = GetDesktopWindow();
             nint progmanPtr = FindWindowEx(descktopPtr, new nint(0), "Progman", null);

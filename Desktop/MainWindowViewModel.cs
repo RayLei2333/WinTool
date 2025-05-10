@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
+using Desktop.Events;
 
 namespace Desktop
 {
@@ -59,5 +60,14 @@ namespace Desktop
         {
             _blockManager.Save();
         }
+
+        #region 订阅BlockItem事件
+
+        public void JustSaveEvent(object sender, JustSaveEventArgs e)
+        {
+            // 调整BlockItem位置
+            _blockManager.Save();
+        }
+        #endregion
     }
 }

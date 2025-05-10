@@ -544,28 +544,12 @@ namespace Desktop
         /// <param name="pointScreen">Where to show the menu</param>
         public void ShowDesktopContextMenu(Point pointScreen)
         {
-            nint progmanHwnd = FindWindow("Progman", null);
-            nint workerwHwnd = nint.Zero;
-            nint shellViewHwnd = nint.Zero;
-
-            // 查找 WorkerW 窗口
-            do
-            {
-                workerwHwnd = FindWindowEx(nint.Zero, workerwHwnd, "WorkerW", null);
-                if (workerwHwnd != nint.Zero)
-                {
-                    shellViewHwnd = FindWindowEx(workerwHwnd, nint.Zero, "SHELLDLL_DefView", null);
-                    if (shellViewHwnd != nint.Zero)
-                    {
-                        break;
-                    }
-                }
-            } while (workerwHwnd != nint.Zero);
+            nint shellViewHwnd = DesktopWindow.FindDescktopWindow();
 
             if (shellViewHwnd != nint.Zero)
             {
                 // 组合 x 和 y 坐标到 lParam
-                nint lParam = pointScreen.Y << 16 | pointScreen.X;
+                nint lParam = (IntPtr)((pointScreen.Y << 16) | pointScreen.X);// pointScreen.Y << 16 | pointScreen.X;
 
                 PostMessage(shellViewHwnd, WM_CONTEXTMENU, nint.Zero, lParam);
             }
