@@ -14,6 +14,9 @@
                 <Button x:Name="folderRightMenuBtn" Width="100" Height="40" Click="folderRightMenuBtn_Click">文件夹右键菜单</Button>
                 <Button x:Name="desktopRightMenuBtn" Width="100" Height="40" Click="desktopRightMenuBtn_Click">桌面右键菜单</Button>
                 <Button x:Name="folderWatchBtn" Width="100" Height="40" Click="folderWatchBtn_Click">文件夹监听</Button>
+                <Button x:Name="folderIconBtn" Width="100" Height="40" Click="folderIconBtn_Click">提取文件夹图标</Button>
+                <Button x:Name="fileLnkIconBtn" Width="100" Height="40" Click="fileLnkIconBtn_Click">提取快捷方式图标</Button>
+                
             </WrapPanel>
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                 <TextBlock Text="文件监听日志"></TextBlock>

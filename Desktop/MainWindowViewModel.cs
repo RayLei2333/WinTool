@@ -56,11 +56,6 @@ namespace Desktop
             }
         }
 
-        public void SaveData()
-        {
-            _blockManager.Save();
-        }
-
         #region 订阅BlockItem事件
 
         public void JustSaveEvent(object sender, JustSaveEventArgs e)

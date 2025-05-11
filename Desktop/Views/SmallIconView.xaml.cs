@@ -16,16 +16,16 @@ using System.Windows.Shapes;
 namespace Desktop.Views
 {
     /// <summary>
-    /// FileListView.xaml 的交互逻辑
+    /// SmallIconView.xaml 的交互逻辑
     /// </summary>
-    public partial class FileListView : System.Windows.Controls.UserControl
+    public partial class SmallIconView : System.Windows.Controls.UserControl
     {
-        public FileListView()
+        public SmallIconView()
         {
             InitializeComponent();
         }
 
-        public FileListView(FileViewTypeViewModel fileViewTypeViewModel):this()
+        public SmallIconView(FileViewTypeViewModel fileViewTypeViewModel) : this()
         {
             this.DataContext = fileViewTypeViewModel;
         }

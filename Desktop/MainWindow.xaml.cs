@@ -33,6 +33,20 @@ namespace Desktop
             Width = SystemParameters.WorkArea.Width;
             Height = SystemParameters.WorkArea.Height;
             this.DataContext = ViewModel;
+
+
+            #region Test Data
+            ViewModel.Blocks[0].FilePathList = new List<string>()
+            {
+                    @"C:\Users\10475\Desktop\test-img",
+                    @"C:\Users\10475\Desktop\10的副本.jpg",
+                    @"C:\Users\10475\Desktop\wb.json",
+                    @"C:\Users\10475\Desktop\Visual Studio 2022.lnk",
+                    @"C:\Users\10475\Desktop\Visual Studio Code.lnk"
+            };
+            IconManager.Instence.SetIcon(ViewModel.Blocks[0].FilePathList);
+            #endregion
+
             //init block
             foreach (var item in ViewModel.Blocks)
             {
@@ -42,6 +56,8 @@ namespace Desktop
 
                 wrapper.Children.Add(block);
             }
+
+            //获取桌面文件夹中的所有文件的图标
 
             //DragSizeControl dragSizeControl = new DragSizeControl();
             //wrapper.Children.Add(dragSizeControl);

@@ -11,14 +11,14 @@ namespace Desktop
         /// <summary>
         /// 列表视图
         /// </summary>
-        List,
+        List = 1,
         /// <summary>
         /// 小图标视图
         /// </summary>
-        SmallIcon,
+        SmallIcon = 2,
         /// <summary>
         /// 大图标视图
         /// </summary>
-        LargeIcon
+        LargeIcon = 3
     }
 }

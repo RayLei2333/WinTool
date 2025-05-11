@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +47,5 @@ namespace Desktop
         /// 文件列表
         /// </summary>
         public List<string> FilePathList { get; set; }
-
-
     }
 }

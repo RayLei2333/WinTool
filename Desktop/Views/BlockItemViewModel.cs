@@ -14,6 +14,8 @@ using Point = System.Windows.Point;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
+using Desktop.Models;
 
 namespace Desktop.Views
 {
@@ -23,6 +25,10 @@ namespace Desktop.Views
         private bool _isDragging = false;
         private Point _clickPosition;
         private Thickness _originalMargin;
+        private FileListView _fileListView;
+        private SmallIconView _smallIconView;
+        private LargeIconView _largeIconView;
+        private FileViewTypeViewModel _fileViewTypeViewModel;
         #endregion
 
         #region Poperties
@@ -56,13 +62,14 @@ namespace Desktop.Views
             }
         }
 
-
+        /// <summary>
+        /// Block最大高度
+        /// </summary>
         public double MaxHeight
         {
             get { return SystemParameters.WorkArea.Height; }
 
         }
-
 
         /// <summary>
         /// 是否锁定状态
@@ -100,6 +107,20 @@ namespace Desktop.Views
             {
                 Data.ViewType = (ViewType)value;
                 OnPropertyChanged("ViewType");
+            }
+        }
+
+        private object _currentView;
+        /// <summary>
+        /// 当前视图
+        /// </summary>
+        public object CurrentView
+        {
+            get { return _currentView; }
+            set
+            {
+                _currentView = value;
+                OnPropertyChanged("CurrentView");
             }
         }
         #endregion
@@ -150,6 +171,8 @@ namespace Desktop.Views
         public BlockItemViewModel(BlockData data)
         {
             Data = data;
+            InitViews();
+            ChangeView();
             BlockItemMargin = new Thickness(Data.X, Data.Y, 0, 0);
             TitleDoubleClickCommand = new ReplayCommand<MouseButtonEventArgs>(TitleDoubleClick);
             TitleKeyUpCommand = new ReplayCommand<KeyEventArgs>(TitleKeyUpown);
@@ -162,6 +185,8 @@ namespace Desktop.Views
         }
 
         #region Command Events
+
+        #region Drag Block
         /// <summary>
         /// 标题栏鼠标按下事件
         /// </summary>
@@ -205,6 +230,8 @@ namespace Desktop.Views
             _isDragging = false;
             JustSaveEvent?.Invoke(this, new JustSaveEventArgs());
         }
+
+        #endregion
 
         /// <summary>
         /// 顶部标题双击事件
@@ -255,13 +282,12 @@ namespace Desktop.Views
             var menuItem = e.Source as MenuItem;
             if (menuItem == null || menuItem.Tag == null)
                 return;
-            //ViewType = Convert.ToInt32(menuItem.Tag);
             int viewType = Convert.ToInt32(menuItem.Tag);
             if (viewType == ViewType)
                 return;
             ViewType = viewType;
+            ChangeView();
             JustSaveEvent?.Invoke(this, new JustSaveEventArgs());
-
         }
         #endregion
 
@@ -271,5 +297,35 @@ namespace Desktop.Views
             Data.Height = height;
             JustSaveEvent?.Invoke(this, new JustSaveEventArgs());
         }
+
+        private void InitViews()
+        {
+            _fileViewTypeViewModel = new FileViewTypeViewModel(Data.FilePathList);
+            _fileListView = new FileListView(_fileViewTypeViewModel);
+            _smallIconView = new SmallIconView(_fileViewTypeViewModel);
+            _largeIconView = new LargeIconView(_fileViewTypeViewModel);
+        }
+
+        private void ChangeView()
+        {
+            switch (Data.ViewType)
+            {
+                case Desktop.ViewType.List:
+                    CurrentView = _fileListView;
+                    _fileViewTypeViewModel.ViewType = Desktop.ViewType.List;
+                    break;
+                case Desktop.ViewType.SmallIcon:
+                    CurrentView = _smallIconView;
+                    _fileViewTypeViewModel.ViewType = Desktop.ViewType.SmallIcon;
+                    break;
+                case Desktop.ViewType.LargeIcon:
+                    CurrentView = _largeIconView;
+                    _fileViewTypeViewModel.ViewType = Desktop.ViewType.LargeIcon;
+                    break;
+                default:
+                    break;
+            }
+        }
+
     }
 }

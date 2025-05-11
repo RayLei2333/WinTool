@@ -106,5 +106,22 @@ namespace Desktop
             if(_fileSystemWatcher != null)
                 _fileSystemWatcher.Dispose();
         }
+
+        private void folderIconBtn_Click(object sender, RoutedEventArgs e)
+        {
+           
+            string testFloderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
+            var icon = IconExtractor.GetIcon48(testFloderPath, true);
+            var bmp = icon.ToBitmap();
+            bmp.Save("C:\\Users\\10475\\Desktop\\test\\fileicon.png");
+        }
+
+        private void fileLnkIconBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string testFilePath = @"C:\Users\10475\Desktop\Visual Studio 2022.lnk";
+            var icon = IconExtractor.GetIcon32(testFilePath, false);
+            var bmp = icon.ToBitmap();
+            bmp.Save("C:\\Users\\10475\\Desktop\\test\\fileicon_lnk.png");
+        }
     }
 }
