@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static Desktop.SuoLueTu;
 
 namespace Desktop
 {
@@ -122,6 +124,29 @@ namespace Desktop
             var icon = IconExtractor.GetIcon32(testFilePath, false);
             var bmp = icon.ToBitmap();
             bmp.Save("C:\\Users\\10475\\Desktop\\test\\fileicon_lnk.png");
+        }
+
+        private void thumbnailBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string filePath = @"C:\Users\23162\Desktop\企业微信截图_17466665218601.png";
+            Guid guid = typeof(IShellItemImageFactory).GUID;
+            //SHCreateItemFromParsingName(filePath, IntPtr.Zero, ref guid, out IShellItemImageFactory imageFactory);
+            SHCreateItemFromParsingName(filePath, IntPtr.Zero, ref guid, out IShellItemImageFactory imageFactory);
+            SIZE size;
+            size.cx = 256;
+            size.cy = 256;
+            //异常System.Runtime.InteropServices.COMException:“0x8004B200”
+
+            imageFactory.GetImage(size, SIIGBF.SIIGBF_RESIZETOFIT | SIIGBF.SIIGBF_THUMBNAILONLY, out IntPtr hBitmap);
+
+            using (Bitmap bmp = System.Drawing.Image.FromHbitmap(hBitmap))
+            {
+                bmp.Save(@"C:\Users\23162\Desktop\test\thumbnail2.png");
+                //Console.WriteLine("High-quality thumbnail saved.");
+            }
+
+            // 清理
+            DeleteObject(hBitmap);
         }
     }
 }
