@@ -1,4 +1,5 @@
 ﻿using Desktop.Events;
+using Desktop.Manager;
 using Desktop.Views;
 using System.IO;
 using System.Text;
@@ -36,15 +37,21 @@ namespace Desktop
 
 
             #region Test Data
-            ViewModel.Blocks[0].FilePathList = new List<string>()
+            List<string> tmpFilePaths = new List<string>()
             {
-                    @"C:\Users\10475\Desktop\test-img",
-                    @"C:\Users\10475\Desktop\10的副本.jpg",
-                    @"C:\Users\10475\Desktop\wb.json",
-                    @"C:\Users\10475\Desktop\Visual Studio 2022.lnk",
-                    @"C:\Users\10475\Desktop\Visual Studio Code.lnk"
+                @"C:\Users\23162\Desktop\WarningLight.cs",
+                @"C:\Users\23162\Desktop\清晰度检测.cs",
+                @"C:\Users\23162\Desktop\微信图片_20250508085933.png",
+                @"C:\Users\23162\Desktop\Config-EFEM",
+                @"C:\Users\23162\Desktop\doc.lnk"
+                //@"C:\Users\10475\Desktop\wb.json",
+                //@"C:\Users\10475\Desktop\Visual Studio 2022.lnk",
+                //@"C:\Users\10475\Desktop\Visual Studio Code.lnk"
             };
-            IconManager.Instence.SetIcon(ViewModel.Blocks[0].FilePathList);
+            ViewModel.Blocks[0].FilePathList = tmpFilePaths;
+            BlockManager.Instence.ResetFileList();
+            var fileList = ViewModel.Blocks.SelectMany(t => t.FileList).ToList();
+            IconManager.Instence.SetIcon(fileList);
             #endregion
 
             //init block

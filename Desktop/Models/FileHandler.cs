@@ -10,6 +10,8 @@ namespace Desktop.Models
     {
         public bool IsFolder { get; set; }
 
+        public bool IsLnkFile { get; set; }
+
         public string Suffix { get; set; }
 
         public string FullPath { get; set; }

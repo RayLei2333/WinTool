@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
 using Desktop.Events;
+using Desktop.Manager;
 
 namespace Desktop
 {

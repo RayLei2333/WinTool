@@ -300,7 +300,7 @@ namespace Desktop.Views
 
         private void InitViews()
         {
-            _fileViewTypeViewModel = new FileViewTypeViewModel(Data.FilePathList);
+            _fileViewTypeViewModel = new FileViewTypeViewModel(Data.Id,Data.FileList);
             _fileListView = new FileListView(_fileViewTypeViewModel);
             _smallIconView = new SmallIconView(_fileViewTypeViewModel);
             _largeIconView = new LargeIconView(_fileViewTypeViewModel);

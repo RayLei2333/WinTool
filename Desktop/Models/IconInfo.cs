@@ -10,27 +10,26 @@ namespace Desktop.Models
     /// <summary>
     /// 
     /// </summary>
-    public class IconInfo
+    public class IconInfo : FileHandler
     {
-        public bool IsFloder { get; set; }
-
-        /// <summary>
-        /// 如果IsFloder = true，则保存文件夹路径
-        /// 如果IsFloder = false，则保存文件后缀
-        /// </summary>
-        public string FileSuffixOrFoldderPath { get; set; }
-
-
         public ImageSource Icon { get; set; }
 
         public IconInfo() { }
 
 
-        public IconInfo(bool isFolder,string fileSuffixOrFolderPath, ImageSource icon)
+        public IconInfo(bool isFolder, string fileSuffixOrFolderPath, ImageSource icon)
         {
-            IsFloder = isFolder;
-            FileSuffixOrFoldderPath = fileSuffixOrFolderPath;
+            IsFolder = isFolder;
+            //FileSuffixOrFoldderPath = fileSuffixOrFolderPath;
             Icon = icon;
+        }
+
+        public IconInfo(FileHandler fileHandler)
+        {
+            this.FullPath = fileHandler.FullPath;
+            this.IsFolder = fileHandler.IsFolder;
+            this.IsLnkFile = fileHandler.IsLnkFile;
+            this.Suffix = fileHandler.Suffix;
         }
     }
 }

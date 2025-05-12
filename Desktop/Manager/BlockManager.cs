@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Desktop.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,7 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Desktop
+namespace Desktop.Manager
 {
     /// <summary>
     /// 桌面分块管理器
@@ -89,8 +90,59 @@ namespace Desktop
             {
                 string json = File.ReadAllText("data.json");
                 BlockData = JsonSerializer.Deserialize<List<BlockData>>(json);
+                //foreach (var block in BlockData)
+                //{
+                //    block.InitFileList();
+                //}
             }
         }
+
+        public void ResetFileList()
+        {
+            foreach (var item in BlockData)
+            {
+                ResetFileList(item.Id);
+            }
+        }
+
+        public void ResetFileList(string blockId)
+        {
+            var block = BlockData.FirstOrDefault(b => b.Id == blockId);
+            if (block == null)
+                return;
+
+            if (block.FilePathList.Any())
+            {
+                if (block.FileList.Any())
+                    block.FileList.Clear();
+                foreach (var filePath in block.FilePathList)
+                {
+                    if (!Directory.Exists(filePath) && !File.Exists(filePath))
+                        continue;
+                    FileData fileData = new FileData()
+                    {
+                        FullPath = filePath,
+                        IsFolder = Directory.Exists(filePath),
+                    };
+                    if (fileData.IsFolder)
+                    {
+                        fileData.Name = Path.GetFileName(filePath);
+                    }
+                    else
+                    {
+                        fileData.Suffix = Path.GetExtension(filePath).ToLower();
+                        fileData.IsLnkFile = fileData.Suffix.CheckIsLnkFileSuffix();
+                        if (fileData.IsLnkFile)
+                            fileData.Name = Path.GetFileNameWithoutExtension(filePath);
+                        else
+                            fileData.Name = Path.GetFileName(filePath);
+                    }
+
+                    block.FileList.Add(fileData);
+                }
+            }
+        }
+
 
         public void Save()
         {

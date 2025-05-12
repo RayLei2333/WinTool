@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Desktop.Models;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Desktop
@@ -31,6 +34,9 @@ namespace Desktop
         /// </summary>
         public double Height { get; set; }
 
+        /// <summary>
+        /// Block名称
+        /// </summary>
         public string Name { get; set; }
 
         /// <summary>
@@ -44,8 +50,14 @@ namespace Desktop
         public ViewType ViewType { get; set; }
 
         /// <summary>
-        /// 文件列表
+        /// 文件路径列表
         /// </summary>
         public List<string> FilePathList { get; set; }
+
+        /// <summary>
+        /// 文件列表
+        /// </summary>
+        [JsonIgnore]
+        public List<FileData> FileList { get; set; } = new List<FileData>();
     }
 }

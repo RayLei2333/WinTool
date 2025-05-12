@@ -28,6 +28,7 @@ namespace Desktop.Views
         public FileListView(FileViewTypeViewModel fileViewTypeViewModel):this()
         {
             this.DataContext = fileViewTypeViewModel;
+            
         }
     }
 }
