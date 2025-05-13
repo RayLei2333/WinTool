@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -44,10 +45,17 @@ namespace Desktop.Behaviors
             AssociatedObject.MouseLeftButtonDown -= OnMouseLeftButtonDown;
         }
 
+        [DllImport("user32.dll")]
+        private static extern uint GetDoubleClickTime();
+
+        public static int GetDoubleClickInterval()
+        {
+            return (int)GetDoubleClickTime();
+        }
         private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var now = DateTime.Now;
-            if ((now - _lastClickTime).TotalMilliseconds < System.Windows.Forms.SystemInformation.DoubleClickTime)
+            if ((now - _lastClickTime).TotalMilliseconds < GetDoubleClickInterval())
             {
                 if (Command?.CanExecute(CommandParameter) == true)
                     Command.Execute(CommandParameter);

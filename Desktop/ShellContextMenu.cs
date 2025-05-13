@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace Desktop
 {
@@ -25,13 +28,39 @@ namespace Desktop
     ///    files[0] = new FileInfo(@"c:\windows\notepad.exe");
     ///    scm.ShowContextMenu(this.Handle, files, Cursor.Position);
     /// </example>
-    public class ShellContextMenu : NativeWindow
+    public class ShellContextMenu : HwndHost//: NativeWindow
     {
+
+        #region Local variabled
+        private IContextMenu _oContextMenu;
+        private IContextMenu2 _oContextMenu2;
+        private IContextMenu3 _oContextMenu3;
+        private IShellFolder _oDesktopFolder;
+        private IShellFolder _oParentFolder;
+        private nint[] _arrPIDLs;
+        private string _strParentFolder;
+        private Dictionary<uint, string> _cmdMap = new();
+        private HwndSource _messageWindow;
+        #endregion
+
         #region Constructor
+
         /// <summary>Default constructor</summary>
         public ShellContextMenu()
         {
-            CreateHandle(new CreateParams());
+            HwndSourceParameters parameters = new("HiddenShellWindow")
+            {
+                Width = 0,
+                Height = 0,
+                PositionX = 0,
+                PositionY = 0,
+                WindowStyle = unchecked((int)0x80000000), // WS_DISABLED
+                ParentWindow = IntPtr.Zero,
+                UsesPerPixelOpacity = false
+            };
+
+            _messageWindow = new HwndSource(parameters);
+            _messageWindow.AddHook(WndProc);
         }
         #endregion
 
@@ -75,25 +104,34 @@ namespace Desktop
 
         #region Override
 
-        /// <summary>
-        /// This method receives WindowMessages. It will make the "Open With" and "Send To" work 
-        /// by calling HandleMenuMsg and HandleMenuMsg2. It will also call the OnContextMenuMouseHover 
-        /// method of Browser when hovering over a ContextMenu item.
-        /// </summary>
-        /// <param name="m">the Message of the Browser's WndProc</param>
-        /// <returns>true if the message has been handled, false otherwise</returns>
-        protected override void WndProc(ref Message m)
+        private IntPtr _hwndSource;
+        protected override HandleRef BuildWindowCore(HandleRef hwndParent)
+        {
+            return new HandleRef(this, IntPtr.Zero);
+        }
+        private IntPtr CreateHwndSource(IntPtr hwndParent)
+        {
+            return IntPtr.Zero;
+        }
+
+        protected override void DestroyWindowCore(HandleRef hwnd)
+        {
+        }
+
+        
+
+        protected override nint WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             #region IContextMenu
 
             if (_oContextMenu != null &&
-                m.Msg == (int)WM.MENUSELECT &&
-                ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.SEPARATOR) == 0 &&
-                ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.POPUP) == 0)
+                msg == (int)WM.MENUSELECT &&
+                ((int)ShellHelper.HiWord(wParam) & (int)MFT.SEPARATOR) == 0 &&
+                ((int)ShellHelper.HiWord(wParam) & (int)MFT.POPUP) == 0)
             {
                 string info = string.Empty;
 
-                if (ShellHelper.LoWord(m.WParam) == (int)CMD_CUSTOM.ExpandCollapse)
+                if (ShellHelper.LoWord(wParam) == (int)CMD_CUSTOM.ExpandCollapse)
                     info = "Expands or collapses the current selected item";
                 else
                 {
@@ -106,13 +144,12 @@ namespace Desktop
             #region IContextMenu2
 
             if (_oContextMenu2 != null &&
-                (m.Msg == (int)WM.INITMENUPOPUP ||
-                 m.Msg == (int)WM.MEASUREITEM ||
-                 m.Msg == (int)WM.DRAWITEM))
+                (msg == (int)WM.INITMENUPOPUP ||
+                 msg == (int)WM.MEASUREITEM ||
+                 msg == (int)WM.DRAWITEM))
             {
-                if (_oContextMenu2.HandleMenuMsg(
-                    (uint)m.Msg, m.WParam, m.LParam) == S_OK)
-                    return;
+                if (_oContextMenu2.HandleMenuMsg((uint)msg, wParam, lParam) == S_OK)
+                    return IntPtr.Zero;
             }
 
             #endregion
@@ -120,17 +157,73 @@ namespace Desktop
             #region IContextMenu3
 
             if (_oContextMenu3 != null &&
-                m.Msg == (int)WM.MENUCHAR)
+                msg == (int)WM.MENUCHAR)
             {
-                if (_oContextMenu3.HandleMenuMsg2(
-                    (uint)m.Msg, m.WParam, m.LParam, nint.Zero) == S_OK)
-                    return;
+                if (_oContextMenu3.HandleMenuMsg2((uint)msg, wParam, lParam, nint.Zero) == S_OK)
+                    return IntPtr.Zero;
             }
 
             #endregion
 
-            base.WndProc(ref m);
+            return IntPtr.Zero;
         }
+
+        /// <summary>
+        /// This method receives WindowMessages. It will make the "Open With" and "Send To" work 
+        /// by calling HandleMenuMsg and HandleMenuMsg2. It will also call the OnContextMenuMouseHover 
+        /// method of Browser when hovering over a ContextMenu item.
+        /// </summary>
+        /// <param name="m">the Message of the Browser's WndProc</param>
+        /// <returns>true if the message has been handled, false otherwise</returns>
+        //protected override void WndProc(ref Message m)
+        //{
+        //    #region IContextMenu
+
+        //    if (_oContextMenu != null &&
+        //        m.Msg == (int)WM.MENUSELECT &&
+        //        ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.SEPARATOR) == 0 &&
+        //        ((int)ShellHelper.HiWord(m.WParam) & (int)MFT.POPUP) == 0)
+        //    {
+        //        string info = string.Empty;
+
+        //        if (ShellHelper.LoWord(m.WParam) == (int)CMD_CUSTOM.ExpandCollapse)
+        //            info = "Expands or collapses the current selected item";
+        //        else
+        //        {
+        //            info = "";
+        //        }
+        //    }
+
+        //    #endregion
+
+        //    #region IContextMenu2
+
+        //    if (_oContextMenu2 != null &&
+        //        (m.Msg == (int)WM.INITMENUPOPUP ||
+        //         m.Msg == (int)WM.MEASUREITEM ||
+        //         m.Msg == (int)WM.DRAWITEM))
+        //    {
+        //        if (_oContextMenu2.HandleMenuMsg(
+        //            (uint)m.Msg, m.WParam, m.LParam) == S_OK)
+        //            return;
+        //    }
+
+        //    #endregion
+
+        //    #region IContextMenu3
+
+        //    if (_oContextMenu3 != null &&
+        //        m.Msg == (int)WM.MENUCHAR)
+        //    {
+        //        if (_oContextMenu3.HandleMenuMsg2(
+        //            (uint)m.Msg, m.WParam, m.LParam, nint.Zero) == S_OK)
+        //            return;
+        //    }
+
+        //    #endregion
+
+        //    base.WndProc(ref m);
+        //}
 
         #endregion
 
@@ -144,8 +237,8 @@ namespace Desktop
             invoke.lpVerbW = (nint)(nCmd - CMD_FIRST);
             invoke.lpDirectoryW = strFolder;
             invoke.fMask = CMIC.UNICODE | CMIC.PTINVOKE |
-                ((Control.ModifierKeys & Keys.Control) != 0 ? CMIC.CONTROL_DOWN : 0) |
-                ((Control.ModifierKeys & Keys.Shift) != 0 ? CMIC.SHIFT_DOWN : 0);
+                ((Keyboard.Modifiers & ModifierKeys.Control) != 0 ? CMIC.CONTROL_DOWN : 0) |
+                ((Keyboard.Modifiers & ModifierKeys.Shift) != 0 ? CMIC.SHIFT_DOWN : 0);
             invoke.ptInvoke = new POINT(pointInvoke.X, pointInvoke.Y);
             invoke.nShow = SW.SHOWNORMAL;
 
@@ -400,12 +493,13 @@ namespace Desktop
                     CMD_FIRST,
                     CMD_LAST,
                     CMF.DEFAULTONLY |
-                    ((Control.ModifierKeys & Keys.Shift) != 0 ? CMF.EXTENDEDVERBS : 0));
+                    ((Keyboard.Modifiers & ModifierKeys.Shift) != 0 ? CMF.EXTENDEDVERBS : 0));
 
                 uint nDefaultCmd = (uint)GetMenuDefaultItem(pMenu, false, 0);
                 if (nDefaultCmd >= CMD_FIRST)
                 {
-                    InvokeCommand(_oContextMenu, nDefaultCmd, arrFI[0].DirectoryName, Control.MousePosition);
+                    var point = Mouse.GetPosition(null);
+                    InvokeCommand(_oContextMenu, nDefaultCmd, arrFI[0].DirectoryName, new Point((int)point.X,(int)point.Y));
                 }
 
                 DestroyMenu(pMenu);
@@ -491,7 +585,7 @@ namespace Desktop
                     CMF.NORMAL |
                     //CMF.DEFAULTONLY |
                      CMF.CANRENAME |
-                    ((Control.ModifierKeys & Keys.Shift) != 0 ? CMF.EXTENDEDVERBS : 0));
+                    ((Keyboard.Modifiers & ModifierKeys.Shift) != 0 ? CMF.EXTENDEDVERBS : 0));
 
                 // 清空旧的命令映射
                 _cmdMap.Clear();
@@ -522,7 +616,7 @@ namespace Desktop
                     TPM.RETURNCMD,
                     pointScreen.X,
                     pointScreen.Y,
-                    Handle,
+                    _messageWindow.Handle,
                     nint.Zero);
 
                 if (nSelected != 0)
@@ -530,7 +624,7 @@ namespace Desktop
                     if (_cmdMap.TryGetValue(nSelected, out var verb) && verb.Equals("rename", StringComparison.OrdinalIgnoreCase))
                     {
                         // ⚠️拦截 rename 动作
-                        MessageBox.Show("你点击了『重命名』，此处执行自定义逻辑。");
+                        System.Windows.MessageBox.Show("你点击了『重命名』，此处执行自定义逻辑。");
                     }
                     else
                     {
@@ -585,17 +679,7 @@ namespace Desktop
 
         #endregion
 
-        #region Local variabled
-        private IContextMenu _oContextMenu;
-        private IContextMenu2 _oContextMenu2;
-        private IContextMenu3 _oContextMenu3;
-        private IShellFolder _oDesktopFolder;
-        private IShellFolder _oParentFolder;
-        private nint[] _arrPIDLs;
-        private string _strParentFolder;
-        // 添加字段（靠近其他 private 字段定义区域）
-        private Dictionary<uint, string> _cmdMap = new();
-        #endregion
+   
 
         #region Variables and Constants
 

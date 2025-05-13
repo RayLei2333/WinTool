@@ -60,7 +60,8 @@ namespace Desktop
 
         private System.Drawing.Point GetMousePosition()
         {
-            return System.Windows.Forms.Cursor.Position;
+            var point = Mouse.GetPosition(null);
+            return new System.Drawing.Point((int)point.X,(int)point.Y);
         }
 
 
@@ -161,8 +162,8 @@ namespace Desktop
             //int iconWidth = (int)GetSystemMetrics(SM_CXICON);
             //int iconHeight = (int)GetSystemMetrics(SM_CYICON);
 
-            int iconWidth = SystemInformation.IconHorizontalSpacing;
-            int iconHeight = SystemInformation.IconVerticalSpacing;
+            int iconWidth = 0;
+            int iconHeight = 0;
 
             this.log.Text += $"桌面图标宽度: {iconWidth}, 桌面图标高度: {iconHeight}\r\n";
         }
@@ -191,7 +192,7 @@ namespace Desktop
         private void pailieBtn_Click(object sender, RoutedEventArgs e)
         {
             // 获取桌面窗口句柄
-            IntPtr hwndDesktop = FindWindow(null, desktopFolderClass);
+            IntPtr hwndDesktop = DesktopWindow.FindDescktopWindow();//FindWindow(null, desktopFolderClass);
 
             // 获取桌面文件夹视图句柄
             IntPtr hwndFolderView = IntPtr.Zero;

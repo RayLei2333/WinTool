@@ -39,14 +39,14 @@ namespace Desktop
             #region Test Data
             List<string> tmpFilePaths = new List<string>()
             {
-                @"C:\Users\23162\Desktop\WarningLight.cs",
-                @"C:\Users\23162\Desktop\清晰度检测.cs",
-                @"C:\Users\23162\Desktop\微信图片_20250508085933.png",
-                @"C:\Users\23162\Desktop\Config-EFEM",
-                @"C:\Users\23162\Desktop\doc.lnk"
-                //@"C:\Users\10475\Desktop\wb.json",
-                //@"C:\Users\10475\Desktop\Visual Studio 2022.lnk",
-                //@"C:\Users\10475\Desktop\Visual Studio Code.lnk"
+                //@"C:\Users\23162\Desktop\WarningLight.cs",
+                //@"C:\Users\23162\Desktop\清晰度检测.cs",
+                //@"C:\Users\23162\Desktop\微信图片_20250508085933.png",
+                //@"C:\Users\23162\Desktop\Config-EFEM",
+                //@"C:\Users\23162\Desktop\doc.lnk"
+                @"C:\Users\10475\Desktop\wb.json",
+                @"C:\Users\10475\Desktop\Visual Studio 2022.lnk",
+                @"C:\Users\10475\Desktop\Visual Studio Code.lnk"
             };
             ViewModel.Blocks[0].FilePathList = tmpFilePaths;
             BlockManager.Instence.ResetFileList();

@@ -49,7 +49,8 @@ namespace Desktop
 
         private System.Drawing.Point GetMousePosition()
         {
-            return System.Windows.Forms.Cursor.Position;
+            return new System.Drawing.Point(0, 0);
+           // return System.Windows.Forms.Cursor.Position;
         }
     }
 }

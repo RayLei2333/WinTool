@@ -1,6 +1,7 @@
 ﻿using Desktop.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -62,10 +63,10 @@ namespace Desktop.Manager
 
 
 
-        public List<IconInfo> GetIcon(ViewType viewType)
-        {
-            return _iconListDic[viewType];
-        }
+        //public List<IconInfo> GetIcon(ViewType viewType)
+        //{
+        //    return _iconListDic[viewType];
+        //}
 
 
 
