@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -62,10 +63,10 @@ namespace Desktop
             return System.Windows.Forms.Cursor.Position;
         }
 
-        
+
         private void folderWatchBtn_Click(object sender, RoutedEventArgs e)
         {
-          
+
             _fileSystemWatcher.EnableRaisingEvents = !_fileSystemWatcher.EnableRaisingEvents;
             if (_fileSystemWatcher.EnableRaisingEvents)
             {
@@ -77,7 +78,7 @@ namespace Desktop
             }
         }
 
-        private void OnError(object sender,ErrorEventArgs e)
+        private void OnError(object sender, ErrorEventArgs e)
         {
             this.Dispatcher.Invoke(() =>
             {
@@ -93,25 +94,25 @@ namespace Desktop
                 this.log.Text += $"类型：{e.ChangeType}，名称：{e.Name},路径：{e.FullPath}" + "\r\n";
             });
             //
-           //e.ChangeType
+            //e.ChangeType
         }
         private void OnRenamed(object sender, RenamedEventArgs e)
         {
-           this.Dispatcher.Invoke(() =>
-            {
-                this.log.Text += $"类型：{e.ChangeType}，名称：{e.Name},路径：{e.FullPath}，原名称：{e.OldName},原路径：{e.OldFullPath}" + "\r\n";
-            });
+            this.Dispatcher.Invoke(() =>
+             {
+                 this.log.Text += $"类型：{e.ChangeType}，名称：{e.Name},路径：{e.FullPath}，原名称：{e.OldName},原路径：{e.OldFullPath}" + "\r\n";
+             });
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if(_fileSystemWatcher != null)
+            if (_fileSystemWatcher != null)
                 _fileSystemWatcher.Dispose();
         }
 
         private void folderIconBtn_Click(object sender, RoutedEventArgs e)
         {
-           
+
             string testFloderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
             var icon = IconExtractor.GetIcon48(testFloderPath, true);
             var bmp = icon.ToBitmap();
@@ -147,6 +148,89 @@ namespace Desktop
 
             // 清理
             DeleteObject(hBitmap);
+        }
+
+
+        //[DllImport("user32.dll", SetLastError = true)]
+        //public static extern IntPtr GetSystemMetrics(int nIndex);
+
+        //const int SM_CXICON = 0x00000011; // 图标宽度
+        //const int SM_CYICON = 0x00000012; // 图标高度
+        private void desktopIconSizelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            //int iconWidth = (int)GetSystemMetrics(SM_CXICON);
+            //int iconHeight = (int)GetSystemMetrics(SM_CYICON);
+
+            int iconWidth = SystemInformation.IconHorizontalSpacing;
+            int iconHeight = SystemInformation.IconVerticalSpacing;
+
+            this.log.Text += $"桌面图标宽度: {iconWidth}, 桌面图标高度: {iconHeight}\r\n";
+        }
+
+
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        private const uint LVM_FIRST = 0x1000;
+        private const uint LVM_GETEXTENDEDLISTVIEWSTYLE = LVM_FIRST + 55;
+
+        private const int LVS_AUTOARRANGE = 0x0040;
+        private const int LVS_ALIGNLEFT = 0x0800;
+        private const int LVS_SNAPTOGRID = 0x0400;
+
+        private const string desktopFolderClass = "Desktop";
+
+
+        private void pailieBtn_Click(object sender, RoutedEventArgs e)
+        {
+            // 获取桌面窗口句柄
+            IntPtr hwndDesktop = FindWindow(null, desktopFolderClass);
+
+            // 获取桌面文件夹视图句柄
+            IntPtr hwndFolderView = IntPtr.Zero;
+            while (hwndDesktop != IntPtr.Zero)
+            {
+                hwndFolderView = FindWindowEx(hwndDesktop, IntPtr.Zero, "SysListView32", null);
+                if (hwndFolderView != IntPtr.Zero)
+                {
+                    break;
+                }
+                hwndDesktop = FindWindowEx(IntPtr.Zero, hwndDesktop, null, null);
+            }
+
+            if (hwndFolderView == IntPtr.Zero)
+            {
+                AppendToLog("无法获取桌面文件夹视图句柄。");
+                return;
+            }
+
+            // 获取桌面文件夹视图的扩展样式
+            IntPtr extendedStyle = SendMessage(hwndFolderView, LVM_GETEXTENDEDLISTVIEWSTYLE, IntPtr.Zero, IntPtr.Zero);
+
+            // 判断自动排列图标状态
+            bool isAutoArrange = ((extendedStyle.ToInt32() & LVS_AUTOARRANGE) == LVS_AUTOARRANGE);
+
+            // 判断与网格对齐状态
+            bool isAlignedToGrid = ((extendedStyle.ToInt32() & LVS_SNAPTOGRID) == LVS_SNAPTOGRID);
+
+            AppendToLog($"自动排列图标: {isAutoArrange}");
+            AppendToLog($"与网格对齐: {isAlignedToGrid}");
+
+            //Console.WriteLine($"自动排列图标: {isAutoArrange}");
+            //Console.WriteLine($"与网格对齐: {isAlignedToGrid}");
+        }
+
+
+        public void AppendToLog(string msg)
+        {
+            this.log.Text += msg+"\r\n";
         }
     }
 }
