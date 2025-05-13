@@ -1,0 +1,18 @@
+﻿<Window x:Class="Desktop.Test2Window"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Desktop"
+        mc:Ignorable="d"
+        Title="Test2Window" Height="450" Width="800">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <WrapPanel x:Name="wrapper">
+                <Button x:Name="fileRightMenuBtn" Width="100" Height="40" Click="fileRightMenuBtn_Click">文件右键菜单</Button>
+                <Button x:Name="folderRightMenuBtn" Width="100" Height="40" Click="folderRightMenuBtn_Click">文件夹右键菜单</Button>
+                <Button x:Name="desktopRightMenuBtn" Width="100" Height="40" Click="desktopRightMenuBtn_Click">桌面右键菜单</Button>
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</Window>

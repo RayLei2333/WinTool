@@ -489,7 +489,27 @@ namespace Desktop
                     CMD_LAST,
                     CMF.EXPLORE |
                     CMF.NORMAL |
+                    //CMF.DEFAULTONLY |
+                     CMF.CANRENAME |
                     ((Control.ModifierKeys & Keys.Shift) != 0 ? CMF.EXTENDEDVERBS : 0));
+
+                // 清空旧的命令映射
+                _cmdMap.Clear();
+
+                // 记录命令 ID -> verb 字符串
+                for (uint i = CMD_FIRST; i < CMD_FIRST + (uint)nResult; i++)
+                {
+                    byte[] buffer = new byte[512];
+                    int hr = _oContextMenu.GetCommandString(i - CMD_FIRST, GCS.VERBA, 0, buffer, buffer.Length);
+                    if (hr == S_OK)
+                    {
+                        string verb = Encoding.ASCII.GetString(buffer).TrimEnd('\0');
+                        if (!string.IsNullOrEmpty(verb))
+                        {
+                            _cmdMap[i] = verb;
+                        }
+                    }
+                }
 
                 Marshal.QueryInterface(iContextMenuPtr, ref IID_IContextMenu2, out iContextMenuPtr2);
                 Marshal.QueryInterface(iContextMenuPtr, ref IID_IContextMenu3, out iContextMenuPtr3);
@@ -507,7 +527,15 @@ namespace Desktop
 
                 if (nSelected != 0)
                 {
-                    InvokeCommand(_oContextMenu, nSelected, _strParentFolder, pointScreen);
+                    if (_cmdMap.TryGetValue(nSelected, out var verb) && verb.Equals("rename", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // ⚠️拦截 rename 动作
+                        MessageBox.Show("你点击了『重命名』，此处执行自定义逻辑。");
+                    }
+                    else
+                    {
+                        InvokeCommand(_oContextMenu, nSelected, _strParentFolder, pointScreen);
+                    }
                 }
 
                 DestroyMenu(pMenu);
@@ -565,6 +593,8 @@ namespace Desktop
         private IShellFolder _oParentFolder;
         private nint[] _arrPIDLs;
         private string _strParentFolder;
+        // 添加字段（靠近其他 private 字段定义区域）
+        private Dictionary<uint, string> _cmdMap = new();
         #endregion
 
         #region Variables and Constants
