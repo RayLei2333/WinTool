@@ -16,8 +16,9 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using Desktop.Models;
+using Desktop.Views;
 
-namespace Desktop.Views
+namespace Desktop.ViewModel
 {
     public class BlockItemViewModel : BaseViewModel
     {
@@ -211,7 +212,7 @@ namespace Desktop.Views
             // 判断是否按下了鼠标左键
             if (!Lock && _isDragging)
             {
-                System.Windows.Point currentPosition = e.GetPosition(null);
+                Point currentPosition = e.GetPosition(null);
                 Vector offset = currentPosition - _clickPosition;
                 Data.X = (int)(_originalMargin.Left + offset.X);
                 Data.Y = (int)(_originalMargin.Top + offset.Y);
@@ -266,7 +267,7 @@ namespace Desktop.Views
         /// </summary>
         private void ViewTypeClick(RoutedEventArgs e)
         {
-            var button = e.Source as System.Windows.Controls.Button;
+            var button = e.Source as Button;
             if (button == null || button.ContextMenu == null)
                 return;
             var contextMenu = button.ContextMenu;
@@ -300,7 +301,7 @@ namespace Desktop.Views
 
         private void InitViews()
         {
-            _fileViewTypeViewModel = new FileViewTypeViewModel(Data.Id,Data.FileList);
+            _fileViewTypeViewModel = new FileViewTypeViewModel(Data.Id, Data.FileList);
             _fileListView = new FileListView(_fileViewTypeViewModel);
             _smallIconView = new SmallIconView(_fileViewTypeViewModel);
             _largeIconView = new LargeIconView(_fileViewTypeViewModel);

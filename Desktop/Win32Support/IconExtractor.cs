@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Desktop
+namespace Desktop.Win32Support
 {
     internal class IconExtractor
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Desktop
+namespace Desktop.ViewModel
 {
     public class BaseViewModel : INotifyPropertyChanged
     {

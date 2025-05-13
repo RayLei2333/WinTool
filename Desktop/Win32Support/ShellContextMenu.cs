@@ -5,30 +5,9 @@ using System.Text;
 using System.Windows.Input;
 using System.Windows.Interop;
 
-namespace Desktop
+namespace Desktop.Win32Support
 {
-    /// <summary>
-    /// "Stand-alone" shell context menu
-    /// 
-    /// It isn't really debugged but is mostly working.
-    /// Create an instance and call ShowContextMenu with a list of FileInfo for the files.
-    /// Limitation is that it only handles files in the same directory but it can be fixed
-    /// by changing the way files are translated into PIDLs.
-    /// 
-    /// Based on FileBrowser in C# from CodeProject
-    /// http://www.codeproject.com/useritems/FileBrowser.asp
-    /// 
-    /// Hooking class taken from MSDN Magazine Cutting Edge column
-    /// http://msdn.microsoft.com/msdnmag/issues/02/10/CuttingEdge/
-    /// 
-    /// </summary>
-    /// <example>
-    ///    ShellContextMenu scm = new ShellContextMenu();
-    ///    FileInfo[] files = new FileInfo[1];
-    ///    files[0] = new FileInfo(@"c:\windows\notepad.exe");
-    ///    scm.ShowContextMenu(this.Handle, files, Cursor.Position);
-    /// </example>
-    public class ShellContextMenu : HwndHost//: NativeWindow
+    public class ShellContextMenu : HwndHost
     {
 
         #region Local variabled
@@ -55,7 +34,7 @@ namespace Desktop
                 PositionX = 0,
                 PositionY = 0,
                 WindowStyle = unchecked((int)0x80000000), // WS_DISABLED
-                ParentWindow = IntPtr.Zero,
+                ParentWindow = nint.Zero,
                 UsesPerPixelOpacity = false
             };
 
@@ -105,20 +84,13 @@ namespace Desktop
         #region Override
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
-            return new HandleRef(this, IntPtr.Zero);
+            return new HandleRef(this, nint.Zero);
         }
-        private IntPtr CreateHwndSource(IntPtr hwndParent)
-        {
-            return IntPtr.Zero;
-        }
-
         protected override void DestroyWindowCore(HandleRef hwnd)
         {
         }
 
-        
-
-        protected override nint WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        protected override nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
         {
             #region IContextMenu
 
@@ -147,7 +119,7 @@ namespace Desktop
                  msg == (int)WM.DRAWITEM))
             {
                 if (_oContextMenu2.HandleMenuMsg((uint)msg, wParam, lParam) == S_OK)
-                    return IntPtr.Zero;
+                    return nint.Zero;
             }
 
             #endregion
@@ -158,12 +130,12 @@ namespace Desktop
                 msg == (int)WM.MENUCHAR)
             {
                 if (_oContextMenu3.HandleMenuMsg2((uint)msg, wParam, lParam, nint.Zero) == S_OK)
-                    return IntPtr.Zero;
+                    return nint.Zero;
             }
 
             #endregion
 
-            return IntPtr.Zero;
+            return nint.Zero;
         }
 
         /// <summary>
@@ -497,7 +469,7 @@ namespace Desktop
                 if (nDefaultCmd >= CMD_FIRST)
                 {
                     var point = Mouse.GetPosition(null);
-                    InvokeCommand(_oContextMenu, nDefaultCmd, arrFI[0].DirectoryName, new Point((int)point.X,(int)point.Y));
+                    InvokeCommand(_oContextMenu, nDefaultCmd, arrFI[0].DirectoryName, new Point((int)point.X, (int)point.Y));
                 }
 
                 DestroyMenu(pMenu);
@@ -581,7 +553,7 @@ namespace Desktop
                     CMD_LAST,
                     CMF.EXPLORE |
                     CMF.NORMAL |
-                    //CMF.DEFAULTONLY |
+                     //CMF.DEFAULTONLY |
                      CMF.CANRENAME |
                     ((Keyboard.Modifiers & ModifierKeys.Shift) != 0 ? CMF.EXTENDEDVERBS : 0));
 
@@ -664,12 +636,12 @@ namespace Desktop
         /// <param name="pointScreen">Where to show the menu</param>
         public void ShowDesktopContextMenu(Point pointScreen)
         {
-            nint shellViewHwnd = DesktopWindow.FindDescktopWindow();
+            nint shellViewHwnd = DesktopWindow.FindDesktopWindow();
 
             if (shellViewHwnd != nint.Zero)
             {
                 // 组合 x 和 y 坐标到 lParam
-                nint lParam = (IntPtr)((pointScreen.Y << 16) | pointScreen.X);// pointScreen.Y << 16 | pointScreen.X;
+                nint lParam = pointScreen.Y << 16 | pointScreen.X;// pointScreen.Y << 16 | pointScreen.X;
 
                 PostMessage(shellViewHwnd, WM_CONTEXTMENU, nint.Zero, lParam);
             }
@@ -677,7 +649,7 @@ namespace Desktop
 
         #endregion
 
-   
+
 
         #region Variables and Constants
 

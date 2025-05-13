@@ -1,6 +1,8 @@
 ﻿using Desktop.Events;
 using Desktop.Manager;
+using Desktop.ViewModel;
 using Desktop.Views;
+using Desktop.Win32Support;
 using System.IO;
 using System.Text;
 using System.Windows;

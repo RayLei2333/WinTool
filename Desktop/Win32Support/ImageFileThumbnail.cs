@@ -5,9 +5,12 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Desktop
+namespace Desktop.Win32Support
 {
-    internal class SuoLueTu
+    /// <summary>
+    /// 图像文件缩略图图标
+    /// </summary>
+    internal class ImageFileThumbnail
     {
         [ComImport]
         [Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
@@ -37,10 +40,10 @@ namespace Desktop
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
         public static extern void SHCreateItemFromParsingName(
-        [In][MarshalAs(UnmanagedType.LPWStr)] string pszPath,
-        IntPtr pbc,
-        [In] ref Guid riid,
-        [Out][MarshalAs(UnmanagedType.Interface)] out IShellItemImageFactory ppv);
+                                                                [In][MarshalAs(UnmanagedType.LPWStr)] string pszPath,
+                                                                IntPtr pbc,
+                                                                [In] ref Guid riid,
+                                                                [Out][MarshalAs(UnmanagedType.Interface)] out IShellItemImageFactory ppv);
 
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);

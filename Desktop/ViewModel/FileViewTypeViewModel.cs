@@ -13,7 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace Desktop.Views
+namespace Desktop.ViewModel
 {
     public class FileViewTypeViewModel : BaseViewModel
     {
@@ -74,7 +74,7 @@ namespace Desktop.Views
         {
             foreach (var item in FileData)
             {
-                string pszFile = (item.IsFolder || item.IsLnkFile) ? item.FullPath : item.Suffix;
+                string pszFile = item.IsFolder || item.IsLnkFile ? item.FullPath : item.Suffix;
                 item.Icon = IconManager.Instence.GetIcon(ViewType, pszFile).Icon;
             }
         }
