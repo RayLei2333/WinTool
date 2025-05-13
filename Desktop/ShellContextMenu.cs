@@ -103,8 +103,6 @@ namespace Desktop
         #endregion
 
         #region Override
-
-        private IntPtr _hwndSource;
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
             return new HandleRef(this, IntPtr.Zero);
@@ -1643,7 +1641,7 @@ namespace Desktop
                 m_hookType,
                 m_filterFunc,
                 nint.Zero,
-                AppDomain.GetCurrentThreadId());
+                Thread.CurrentThread.ManagedThreadId);
         }
         // ************************************************************************
 
