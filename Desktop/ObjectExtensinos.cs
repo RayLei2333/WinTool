@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Desktop.Manager;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -26,7 +27,8 @@ namespace Desktop
         /// <returns></returns>
         public static bool CheckIsImgFileSuffix(this string str)
         {
-            return false;
+
+            return IconManager.ImageFormats.Contains(str);
         }
     }
 }

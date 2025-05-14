@@ -20,11 +20,12 @@
                 <Button x:Name="desktopIconSizelBtn" Width="100" Height="40" Click="desktopIconSizelBtn_Click">获取桌面图标大小</Button>
                 <Button x:Name="pailieBtn" Width="100" Height="40" Click="pailieBtn_Click">获取自动排列图标和与网格对齐</Button>
                 <Button x:Name="allImageFormatBtn" Width="100" Height="40" Click="allImageFormatBtn_Click">获取所有图片编码格式</Button>
+                <Button x:Name="desktopAllFileBtn" Width="100" Height="40" Click="desktopAllFileBtn_Click">获取桌面所有文件</Button>
 
             </WrapPanel>
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                 <TextBlock Text="文件监听日志"></TextBlock>
-                <TextBlock x:Name="log"></TextBlock>
+                <TextBox x:Name="log" MaxHeight="300"></TextBox>
             </StackPanel>
         </StackPanel>
     </Grid>

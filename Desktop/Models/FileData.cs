@@ -20,6 +20,11 @@ namespace Desktop.Models
         public bool IsLnkFile { get; set; }
 
         /// <summary>
+        /// 是否为图片文件
+        /// </summary>
+        public bool IsImageFile { get; set; }
+
+        /// <summary>
         /// 文件后缀
         /// </summary>
         public string Suffix { get; set; }

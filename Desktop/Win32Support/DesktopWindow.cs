@@ -17,6 +17,22 @@ namespace Desktop.Win32Support
         nint _shellViewPtr = nint.Zero;
 
         const uint LVM_FIRST = 0x1000;
+
+        const int LVM_GETITEMCOUNT = 0x1000 + 4;
+        const int LVM_GETITEMPOSITION = 0x1000 + 16;
+        const int LVM_GETITEMTEXT = 0x1000 + 115;
+
+        const int LVIF_TEXT = 0x0001;
+
+        const uint PROCESS_VM_OPERATION = 0x0008;
+        const uint PROCESS_VM_READ = 0x0010;
+        const uint PROCESS_VM_WRITE = 0x0020;
+        const uint PROCESS_QUERY_INFORMATION = 0x0400;
+
+        const uint MEM_COMMIT = 0x1000;
+        const uint MEM_RELEASE = 0x8000;
+        const uint PAGE_READWRITE = 0x04;
+
         //获取图标视图，大图标、中等图标、小图标
         const uint LVM_GETITEMSPACING = LVM_FIRST + 51;
         //获取自动排列and网格对齐方式
@@ -26,6 +42,7 @@ namespace Desktop.Win32Support
         const int LVS_ALIGNLEFT = 0x0800;
         const int LVS_SNAPTOGRID = 0x0400;
         #endregion
+
 
         #region DLL Import
         [DllImport("user32.dll", EntryPoint = "GetDesktopWindow", CharSet = CharSet.Auto, SetLastError = true)]
@@ -43,11 +60,55 @@ namespace Desktop.Win32Support
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint SendMessage(IntPtr hWnd, uint Msg, uint wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint SendMessage(IntPtr hWnd, uint Msg, uint wParam, ref LVITEM lParam);
+
         [DllImport("user32.dll")]
         static extern uint GetDpiForWindow(IntPtr hwnd);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out int lpNumberOfBytesRead);
+
+        [DllImport("kernel32.dll")]
+        static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint dwFreeType);
+
+        [DllImport("kernel32.dll")]
+        static extern bool CloseHandle(IntPtr hObject);
+
+        [DllImport("user32.dll")]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, int dwSize, out IntPtr lpNumberOfBytesWritten);
+
         #endregion
 
-        #region FindDesktopWindow()
+        #region Structs
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct LVITEM
+        {
+            public uint mask;
+            public int iItem;
+            public int iSubItem;
+            public int state;
+            public int stateMask;
+            public IntPtr pszText;
+            public int cchTextMax;
+            public int iImage;
+            public IntPtr lParam;
+        }
+        #endregion
+
+        #region FindDesktopWindow
         /// <summary>
         /// 查找桌面窗体
         /// </summary>
@@ -149,7 +210,6 @@ namespace Desktop.Win32Support
             if (File.Exists(wallpaperPath))
                 return wallpaperPath;
             return null;
-            //return wallpaperPath.ToString();
         }
         #endregion
 
@@ -213,5 +273,69 @@ namespace Desktop.Win32Support
             };
         }
 
+
+        public static List<DesktopIconInfo> GetDesktopIcon()
+        {
+            var listView = FindSysListView32();
+            if (listView == IntPtr.Zero)
+                return null;
+
+            List<DesktopIconInfo> desktopIconList = new List<DesktopIconInfo>();
+            _ = GetWindowThreadProcessId(listView, out int processId);
+            IntPtr hProcess = OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, false, processId);
+
+            int count = (int)SendMessage(listView, LVM_GETITEMCOUNT, 0, IntPtr.Zero);
+
+            IntPtr remoteBuffer = VirtualAllocEx(hProcess, IntPtr.Zero, 4096, MEM_COMMIT, PAGE_READWRITE);
+
+            for (int i = 0; i < count; i++)
+            {
+                // --- 获取位置 ---
+                IntPtr positionBuffer = remoteBuffer;
+                SendMessage(listView, LVM_GETITEMPOSITION, (uint)i, positionBuffer);
+
+                byte[] posData = new byte[8]; // 2x int
+                ReadProcessMemory(hProcess, positionBuffer, posData, posData.Length, out _);
+                int x = BitConverter.ToInt32(posData, 0);
+                int y = BitConverter.ToInt32(posData, 4);
+
+                // --- 获取标题 ---
+                IntPtr textBuffer = remoteBuffer + 64; // 偏移64，避免覆盖
+                LVITEM lvItem = new LVITEM
+                {
+                    mask = LVIF_TEXT,
+                    iItem = i,
+                    iSubItem = 0,
+                    pszText = textBuffer,
+                    cchTextMax = 260
+                };
+
+                int lvItemSize = Marshal.SizeOf(typeof(LVITEM));
+                IntPtr localLvItem = Marshal.AllocHGlobal(lvItemSize);
+                Marshal.StructureToPtr(lvItem, localLvItem, false);
+
+                WriteProcessMemory(hProcess, remoteBuffer, localLvItem, lvItemSize, out _);
+                SendMessage(listView, LVM_GETITEMTEXT, (uint)i, remoteBuffer);
+
+                byte[] textData = new byte[520]; // Unicode string
+                ReadProcessMemory(hProcess, textBuffer, textData, textData.Length, out _);
+                string title = Encoding.Unicode.GetString(textData);//.TrimEnd('\0');
+                int nullIndex = title.IndexOf('\0');
+                title = nullIndex >= 0 ? title.Substring(0, nullIndex) : title;
+                Marshal.FreeHGlobal(localLvItem);
+                desktopIconList.Add(new DesktopIconInfo()
+                {
+                    Index = i,
+                    Name = title,
+                    X = x,
+                    Y = y,
+                });
+            }
+
+            VirtualFreeEx(hProcess, remoteBuffer, 0, MEM_RELEASE);
+            CloseHandle(hProcess);
+
+            return desktopIconList;
+        }
     }
 }

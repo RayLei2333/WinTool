@@ -31,6 +31,7 @@ namespace Desktop
         public TestWindow()
         {
             InitializeComponent();
+            _log = log;
             _fileSystemWatcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             _fileSystemWatcher.Filter = "*.*";
             _fileSystemWatcher.Error += OnError;
@@ -211,6 +212,12 @@ namespace Desktop
             //Console.WriteLine($"与网格对齐: {isAlignedToGrid}");
         }
 
+        public static TextBox _log;
+        public static void AppendLog(string msg)
+        {
+            _log.Text += msg+"\r\n";
+        }
+
 
         public void AppendToLog(string msg)
         {
@@ -228,6 +235,19 @@ namespace Desktop
                 AppendToLog("-------------------------------------------------");
             }
 
+        }
+
+
+
+
+        private void desktopAllFileBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var list = DesktopWindow.GetDesktopIcon();
+            int index = 1;
+            foreach (var item in list)
+            {
+                AppendLog($"[{index++}],{item.Name},[{item.X},{item.Y}]");
+            }
         }
     }
 }

@@ -24,7 +24,12 @@
     <Window.Resources>
         <converts:ValueEqualsConverter x:Key="ValueEqualsConverter"></converts:ValueEqualsConverter>
     </Window.Resources>
-    <WrapPanel x:Name="wrapper">
+    
+    <Grid>
+        <WrapPanel x:Name="wrapper">
 
-    </WrapPanel>
+        </WrapPanel>
+
+        <Grid></Grid>
+    </Grid>
 </Window>

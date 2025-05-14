@@ -132,6 +132,7 @@ namespace Desktop.Manager
                     {
                         fileData.Suffix = Path.GetExtension(filePath).ToLower();
                         fileData.IsLnkFile = fileData.Suffix.CheckIsLnkFileSuffix();
+                        fileData.IsImageFile = fileData.Suffix.CheckIsImgFileSuffix();
                         if (fileData.IsLnkFile)
                             fileData.Name = Path.GetFileNameWithoutExtension(filePath);
                         else

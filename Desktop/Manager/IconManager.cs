@@ -13,9 +13,11 @@ using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using static Desktop.Win32Support.ImageFileThumbnail;
 
 namespace Desktop.Manager
 {
+
     /// <summary>
     /// 图标管理器
     /// </summary>
@@ -25,6 +27,24 @@ namespace Desktop.Manager
 
         public static IconManager Instence => _instence;
 
+        /// <summary>
+        /// 所有图片格式的缓存
+        /// </summary>
+        public static List<string> ImageFormats { get; set; } = new List<string>();
+
+        static IconManager()
+        {
+            ImageCodecInfo[] imageEncoders = ImageCodecInfo.GetImageEncoders();
+            foreach (ImageCodecInfo encoder in imageEncoders)
+            {
+                string[] filenameExtension = encoder.FilenameExtension.Replace("*", "").ToLower().Split(";");
+                ImageFormats.AddRange(filenameExtension);
+            }
+        }
+
+        /// <summary>
+        /// 图标的缓存
+        /// </summary>
         private Dictionary<ViewType, List<IconInfo>> _iconListDic = new Dictionary<ViewType, List<IconInfo>>()
         {
             [ViewType.List] = new List<IconInfo>(),
@@ -32,44 +52,135 @@ namespace Desktop.Manager
             [ViewType.LargeIcon] = new List<IconInfo>()
         };
 
-        private List<FileHandler> SuffixList { get; set; } = new List<FileHandler>();
+        //默认后缀缓存
+        private List<string> _defaultFileSuffixList = new List<string>();
+
+        //存储后缀名称，完整路径信息，避免每次重复去获取
+        //新增修改就检查suffixList
+        private List<IconInfo> SuffixList { get; set; } = new List<IconInfo>();
+
+
 
 
         public void SetIcon(List<FileData> files)
         {
 
             SetFileSuffix(files);
+            _defaultFileSuffixList.AddRange(ImageFormats);
+            _defaultFileSuffixList = _defaultFileSuffixList.Distinct().ToList();
+            //先获取默认图标
+            foreach (var suffix in _defaultFileSuffixList)
+            {
+                ExtractorIcon(suffix);
+            }
+
+            //提取非默认图标，比如文件夹，lnk文件，图片
             foreach (var suffix in SuffixList)
             {
-                string pszFile = (suffix.IsFolder || suffix.IsLnkFile) ? suffix.FullPath : suffix.Suffix;
-                foreach (var item in _iconListDic)
+                //判断是否图片格式，如果是图片格式则去获取缩略图
+                //如果缩略图获取失败了，再从缓存中去获取对应图标
+                if (suffix.IsImageFile)
                 {
-                    IconInfo iconInfo = new IconInfo(suffix);
-                    switch (item.Key)
-                    {
-                        case ViewType.List:
-                            iconInfo.Icon = GetIcon(IconExtractor.GetIcon16(pszFile, iconInfo.IsFolder));
-                            break;
-                        case ViewType.SmallIcon:
-                            iconInfo.Icon = GetIcon(IconExtractor.GetIcon32(pszFile, iconInfo.IsFolder));
-                            break;
-                        case ViewType.LargeIcon:
-                            iconInfo.Icon = GetIcon(IconExtractor.GetIcon48(pszFile, iconInfo.IsFolder));
-                            break;
-                    }
-                    item.Value.Add(iconInfo);
+                    ImageThumbnail(suffix);
+                }
+                else
+                {
+                    //获取对应图标
+                    ExtractorIcon(suffix);
                 }
             }
         }
 
+        private void ExtractorIcon(string pszFile)
+        {
+            foreach (var item in _iconListDic)
+            {
+                IconInfo iconInfo = new IconInfo()
+                {
+                    Suffix = pszFile,
+                    Icon =  ExtractorIcon(pszFile, item.Key, false)
+                };
 
+                item.Value.Add(iconInfo);
+            }
+        }
 
-        //public List<IconInfo> GetIcon(ViewType viewType)
-        //{
-        //    return _iconListDic[viewType];
-        //}
+        private void ExtractorIcon(IconInfo suffix)
+        {
+            string pszFile = (suffix.IsFolder || suffix.IsLnkFile) ? suffix.FullPath : suffix.Suffix;
+            foreach (var item in _iconListDic)
+            {
+                IconInfo iconInfo = suffix.Clone();
+                ExtractorIcon(pszFile, item.Key, iconInfo.IsFolder);
+                item.Value.Add(iconInfo);
+            }
+        }
 
+        private ImageSource ExtractorIcon(string pszFile, ViewType viewType, bool chekcDisk)
+        {
+            switch (viewType)
+            {
+                case ViewType.List:
+                    return GetIcon(IconExtractor.GetIcon16(pszFile, chekcDisk));
+                case ViewType.SmallIcon:
+                    return GetIcon(IconExtractor.GetIcon32(pszFile, chekcDisk));
+                case ViewType.LargeIcon:
+                    return GetIcon(IconExtractor.GetIcon48(pszFile, chekcDisk));
+            }
 
+            return null;
+        }
+
+        private void ImageThumbnail(IconInfo suffix)
+        {
+            //获取缩略图
+            foreach (var item in _iconListDic)
+            {
+                IconInfo iconInfo = suffix.Clone();
+                switch (item.Key)
+                {
+                    //图片列表模式则直接使用小icon
+                    case ViewType.SmallIcon:
+                        iconInfo.Icon = ImageThumbnail(iconInfo.FullPath, 32, 32);
+                        break;
+                    case ViewType.LargeIcon:
+                        iconInfo.Icon = ImageThumbnail(iconInfo.FullPath, 48, 48);
+                        break;
+                }
+
+                //如果获取到图片的缩略图是空的，就从缓存中去取一个
+                if (iconInfo.Icon == null)
+                    iconInfo.Icon = _iconListDic[item.Key].FirstOrDefault(t => t.Suffix == iconInfo.Suffix)?.Icon;
+                item.Value.Add(iconInfo);
+
+            }
+        }
+
+        private ImageSource ImageThumbnail(string filePath, int width, int height)
+        {
+            try
+            {
+                Guid guid = typeof(IShellItemImageFactory).GUID;
+                SHCreateItemFromParsingName(filePath, IntPtr.Zero, ref guid, out IShellItemImageFactory imageFactory);
+                SIZE size;
+                size.cx = width;
+                size.cy = height;
+                //异常System.Runtime.InteropServices.COMException:“0x8004B200”
+
+                imageFactory.GetImage(size, SIIGBF.SIIGBF_RESIZETOFIT | SIIGBF.SIIGBF_THUMBNAILONLY, out IntPtr hBitmap);
+                using (Bitmap bmp = Image.FromHbitmap(hBitmap))
+                {
+                    // 清理
+                    DeleteObject(hBitmap);
+                    return GetIcon(bmp);
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+        }
 
 
         public IconInfo GetIcon(ViewType viewType, string pszFile)
@@ -125,46 +236,53 @@ namespace Desktop.Manager
 
         private void SetFileSuffix(List<FileData> files)
         {
+            //1、先从files中获取所有文件后缀，需要排除IsFolder和IsLnkFile为true的数据
+            var tmpList = files.Where(t => !t.IsFolder &&
+                                           !t.IsLnkFile &&
+                                           !t.IsImageFile &&
+                                           !_defaultFileSuffixList.Any(c => c == t.Suffix)).Select(t => t.Suffix).Distinct().ToList();
+            _defaultFileSuffixList.AddRange(tmpList);
+
+            //2、具体要获取的完整的路径文件，包含Folder和LnkFile
             foreach (var file in files)
             {
-                if (file.IsFolder || file.IsLnkFile)
+                if (file.IsFolder || file.IsLnkFile || file.IsImageFile)
                 {
                     if (!SuffixList.Any(t => t.FullPath == file.FullPath))
                     {
-                        SuffixList.Add(new FileHandler()
+                        SuffixList.Add(new IconInfo()
                         {
                             IsFolder = file.IsFolder,
                             FullPath = file.FullPath,
                             Suffix = file.Suffix,
-                            IsLnkFile = file.IsLnkFile
+                            IsLnkFile = file.IsLnkFile,
+                            IsImageFile = file.IsImageFile,
                         });
                     }
                 }
-                if (!SuffixList.Any(t => t.Suffix == file.Suffix))
-                {
-                    SuffixList.Add(new FileHandler()
-                    {
-                        Suffix = file.Suffix,
-                    });
-                }
             }
+
         }
 
         public static ImageSource GetIcon(Icon icon)
         {
             using (var bitmap = icon.ToBitmap())
             {
-                using (var stream = new MemoryStream())
-                {
-                    bitmap.Save(stream, ImageFormat.Png);
-                    var bitmapImage = new BitmapImage();
-                    bitmapImage.BeginInit();
-                    bitmapImage.StreamSource = new MemoryStream(stream.ToArray());
-                    bitmapImage.EndInit();
-                    return bitmapImage;
-                }
+                return GetIcon(bitmap);
             }
+        }
 
+        public static ImageSource GetIcon(Bitmap bitmap)
+        {
+            using (var stream = new MemoryStream())
+            {
+                bitmap.Save(stream, ImageFormat.Png);
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = new MemoryStream(stream.ToArray());
+                bitmapImage.EndInit();
+                return bitmapImage;
+            }
         }
 
         private IconInfo FindIconByExtension(ICollection<IconInfo> iconList, string extension)
