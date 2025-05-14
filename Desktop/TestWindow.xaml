@@ -17,6 +17,7 @@
                 <Button x:Name="folderIconBtn" Width="100" Height="40" Click="folderIconBtn_Click">提取文件夹图标</Button>
                 <Button x:Name="fileLnkIconBtn" Width="100" Height="40" Click="fileLnkIconBtn_Click">提取快捷方式图标</Button>
                 <Button x:Name="thumbnailBtn" Width="100" Height="40" Click="thumbnailBtn_Click">获取图像文件缩略图</Button>
+                <Button x:Name="defaultFileIconBtn" Width="100" Height="40" Click="defaultFileIconBtn_Click">获取文件默认图标</Button>
                 <Button x:Name="desktopIconSizelBtn" Width="100" Height="40" Click="desktopIconSizelBtn_Click">获取桌面图标大小</Button>
                 <Button x:Name="pailieBtn" Width="100" Height="40" Click="pailieBtn_Click">获取自动排列图标和与网格对齐</Button>
                 <Button x:Name="allImageFormatBtn" Width="100" Height="40" Click="allImageFormatBtn_Click">获取所有图片编码格式</Button>

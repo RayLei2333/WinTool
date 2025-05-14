@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Desktop.Models;
 using Desktop.Win32Support;
 using static Desktop.Win32Support.ImageFileThumbnail;
 
@@ -64,7 +65,7 @@ namespace Desktop
         private System.Drawing.Point GetMousePosition()
         {
             var point = Mouse.GetPosition(null);
-            return new System.Drawing.Point((int)point.X,(int)point.Y);
+            return new System.Drawing.Point((int)point.X, (int)point.Y);
         }
 
 
@@ -114,45 +115,80 @@ namespace Desktop
                 _fileSystemWatcher.Dispose();
         }
 
+        List<int> iconSizeList = new List<int>()
+        {
+            16,32,48,64,128
+        };
         private void folderIconBtn_Click(object sender, RoutedEventArgs e)
         {
-
             string testFloderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
-            var icon = IconExtractor.GetIcon48(testFloderPath, true);
-            var bmp = icon.ToBitmap();
-            bmp.Save("C:\\Users\\10475\\Desktop\\test\\fileicon.png");
+            foreach (var item in iconSizeList)
+            {
+                var icon = IconExtractor.GetIconBitmap(testFloderPath, item);
+                //var bmp = icon.ToBitmap();
+                icon.Save(@$"C:\Users\23162\Desktop\test\folder_{item}.png");
+            }
+
         }
 
         private void fileLnkIconBtn_Click(object sender, RoutedEventArgs e)
         {
-            string testFilePath = @"C:\Users\10475\Desktop\Visual Studio 2022.lnk";
-            var icon = IconExtractor.GetIcon32(testFilePath, false);
-            var bmp = icon.ToBitmap();
-            bmp.Save("C:\\Users\\10475\\Desktop\\test\\fileicon_lnk.png");
+            string testFilePath = @"C:\Users\23162\Desktop\Visual Studio 2022.lnk";
+            foreach (var item in iconSizeList)
+            {
+                var icon = IconExtractor.GetIconBitmap(testFilePath, item);
+                //var bmp = icon.ToBitmap();
+                icon.Save(@$"C:\Users\23162\Desktop\test\lnkfile_{item}.png");
+            }
+
         }
 
         private void thumbnailBtn_Click(object sender, RoutedEventArgs e)
         {
-            string filePath = @"C:\Users\23162\Desktop\企业微信截图_17466665218601.png";
-            Guid guid = typeof(IShellItemImageFactory).GUID;
-            //SHCreateItemFromParsingName(filePath, IntPtr.Zero, ref guid, out IShellItemImageFactory imageFactory);
-            SHCreateItemFromParsingName(filePath, IntPtr.Zero, ref guid, out IShellItemImageFactory imageFactory);
-            SIZE size;
-            size.cx = 256;
-            size.cy = 256;
-            //异常System.Runtime.InteropServices.COMException:“0x8004B200”
-
-            imageFactory.GetImage(size, SIIGBF.SIIGBF_RESIZETOFIT | SIIGBF.SIIGBF_THUMBNAILONLY, out IntPtr hBitmap);
-
-            using (Bitmap bmp = System.Drawing.Image.FromHbitmap(hBitmap))
+            string filePath = @"C:\Users\23162\Desktop\屏幕截图 2025-02-27 101443.png";
+            foreach (var item in iconSizeList)
             {
-                bmp.Save(@"C:\Users\23162\Desktop\test\thumbnail2.png");
-                //Console.WriteLine("High-quality thumbnail saved.");
+                var icon = IconExtractor.GetIconBitmap(filePath, item);
+                //var bmp = icon.ToBitmap();
+                icon.Save(@$"C:\Users\23162\Desktop\test\imagefile_{item}.png");
             }
 
-            // 清理
-            DeleteObject(hBitmap);
+            //Guid guid = typeof(IShellItemImageFactory).GUID;
+            ////SHCreateItemFromParsingName(filePath, IntPtr.Zero, ref guid, out IShellItemImageFactory imageFactory);
+            //SHCreateItemFromParsingName(filePath, IntPtr.Zero, ref guid, out IShellItemImageFactory imageFactory);
+            //SIZE size;
+            //size.cx = 256;
+            //size.cy = 256;
+            ////异常System.Runtime.InteropServices.COMException:“0x8004B200”
+
+            //imageFactory.GetImage(size, SIIGBF.SIIGBF_RESIZETOFIT | SIIGBF.SIIGBF_THUMBNAILONLY, out IntPtr hBitmap);
+
+            //using (Bitmap bmp = System.Drawing.Image.FromHbitmap(hBitmap))
+            //{
+            //    bmp.Save(@"C:\Users\23162\Desktop\test\thumbnail2.png");
+            //    //Console.WriteLine("High-quality thumbnail saved.");
+            //}
+
+            //// 清理
+            //DeleteObject(hBitmap);
         }
+        private void defaultFileIconBtn_Click(object sender, RoutedEventArgs e)
+        {
+            List<string> list = new List<string>()
+            {
+                ".jpg",".txt",".pdf"
+            };
+
+            foreach (int size in iconSizeList)
+            {
+                foreach (string s in list)
+                {
+                    var icon = IconExtractor.GetIconBitmap(s, size);
+                    icon.Save(@$"C:\Users\23162\Desktop\test\{s}file_{size}.png");
+                }
+            }
+        }
+
         private void desktopIconSizelBtn_Click(object sender, RoutedEventArgs e)
         {
             //int iconWidth = (int)GetSystemMetrics(SM_CXICON);
@@ -165,7 +201,7 @@ namespace Desktop
 
 
 
-       
+
 
 
         private void pailieBtn_Click(object sender, RoutedEventArgs e)

@@ -1,404 +1,203 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Desktop.Win32Support
 {
-    internal class IconExtractor
+    class IconExtractor
     {
-        #region Variables and Constants
-        public const int SHIL_LARGE = 0x0;
-        public const int SHIL_SMALL = 0x1;
-        public const int SHIL_EXTRALARGE = 0x2;
-        public const int SHIL_SYSSMALL = 0x3;
-        public const int SHIL_JUMBO = 0x4;
-        public const int SHIL_LAST = 0x4;
-
-        const int ILD_TRANSPARENT = 0x00000001;
-        const int ILD_IMAGE = 0x00000020;
-
-        const string IID_IImageList = "46EB5926-582E-4017-9FDF-E8998DAA0950";
-        const string IID_IImageList2 = "192B9D83-50FC-457B-90A0-2B82A8B5DAE1";
-        #endregion
-
-        #region DLL Improt
-        [DllImport("shell32.dll", EntryPoint = "#727")]
-        extern static int SHGetImageList(int iImageList, ref Guid riid, ref IImageList ppv);
-
-        [DllImport("user32.dll", EntryPoint = "DestroyIcon", SetLastError = true)]
-        static extern int DestroyIcon(nint hIcon);
-
-        [DllImport("shell32.dll")]
-        static extern uint SHGetIDListFromObject([MarshalAs(UnmanagedType.IUnknown)] object iUnknown, out nint ppidl);
-
-        [DllImport("Shell32.dll")]
-        static extern nint SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbFileInfo, uint uFlags);
-
-        #endregion
-
-        #region Get Icon
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pszFile"></param>
-        /// <param name="checkDisk">true：获取文件夹图标；false：获取文件图标</param>
-        /// <returns></returns>
-        public static int GetIconIndex(string pszFile, bool checkDisk)
-        {
-            SHFILEINFO sfi = new SHFILEINFO();
-            //uint flags = (uint)(SHGFI.SysIconIndex | SHGFI.LargeIcon | SHGFI.UseFileAttributes);
-            uint flags = (uint)(SHGFI.SysIconIndex | SHGFI.LargeIcon);
-            if (!checkDisk)
-                flags |= (uint)SHGFI.UseFileAttributes;
-            SHGetFileInfo(pszFile, 0, ref sfi, (uint)Marshal.SizeOf(sfi), flags);
-            return sfi.iIcon;
-        }
-
-        /// <summary>
-        /// 获取图标256*256大小
-        /// </summary>
-        /// <param name="pszFile"></param>
-        /// <param name="checkDisk"></param>
-        /// <returns></returns>
-        public static Icon GetIcon256(string pszFile, bool checkDisk)
-        {
-            return GetIcon(pszFile, checkDisk, SHIL_JUMBO);
-        }
-
-        /// <summary>
-        /// 获取图标48*48大小
-        /// </summary>
-        /// <param name="pszFile"></param>
-        /// <param name="checkDisk"></param>
-        /// <returns></returns>
-        public static Icon GetIcon48(string pszFile, bool checkDisk)
-        {
-            return GetIcon(pszFile, checkDisk, SHIL_EXTRALARGE);
-        }
-
-        /// <summary>
-        /// 获取图标32*32大小
-        /// </summary>
-        /// <param name="pszFile"></param>
-        /// <param name="checkDisk"></param>
-        /// <returns></returns>
-        public static Icon GetIcon32(string pszFile, bool checkDisk)
-        {
-            return GetIcon(pszFile, checkDisk, SHIL_LARGE);
-        }
-
-        /// <summary>
-        /// 获取图标16*16大小
-        /// </summary>
-        /// <param name="pszFile">文件后缀名</param>
-        /// <param name="checkDisk"></param>
-        /// <returns></returns>
-        public static Icon GetIcon16(string pszFile, bool checkDisk)
-        {
-            return GetIcon(pszFile, checkDisk, SHIL_SMALL);
-        }
-
-        /// <summary>
-        /// 获取文件图标
-        /// </summary>
-        /// <param name="pszFile">文件后缀</param>
-        /// <param name="checkDisk"></param>
-        /// <param name="iImageList">图像大小
-        /// <see cref="SHIL_SMALL"/>
-        /// <see cref="SHIL_LARGE"/>
-        /// <see cref="SHIL_EXTRALARGE"/>
-        /// <see cref="SHIL_JUMBO"/>
-        /// </param>
-        /// <returns></returns>
-        public static Icon GetIcon(string pszFile, bool checkDisk, int iImageList)
-        {
-            int iImage = GetIconIndex(pszFile, checkDisk);
-            IImageList spiml = null;
-            Guid guil = new Guid(IID_IImageList);//or IID_IImageList
-
-            SHGetImageList(iImageList, ref guil, ref spiml);
-            nint hIcon = nint.Zero;
-            spiml.GetIcon(iImage, ILD_TRANSPARENT | ILD_IMAGE, ref hIcon); //
-            return ToIcon(hIcon);
-        }
-
-        private static Icon ToIcon(nint hIcon)
-        {
-            Icon ico = (Icon)Icon.FromHandle(hIcon).Clone();
-            DestroyIcon(hIcon);
-            return ico;
-
-        }
-        #endregion
-
-        #region Enum
         [Flags]
-        enum SHGFI : uint
+        public enum SIIGBF
         {
-            /// <summary>get icon</summary>
-            Icon = 0x000000100,
-            /// <summary>get display name</summary>
-            DisplayName = 0x000000200,
-            /// <summary>get type name</summary>
-            TypeName = 0x000000400,
-            /// <summary>get attributes</summary>
-            Attributes = 0x000000800,
-            /// <summary>get icon location</summary>
-            IconLocation = 0x000001000,
-            /// <summary>return exe type</summary>
-            ExeType = 0x000002000,
-            /// <summary>get system icon index</summary>
-            SysIconIndex = 0x000004000,
-            /// <summary>put a link overlay on icon</summary>
-            LinkOverlay = 0x000008000,
-            /// <summary>show icon in selected state</summary>
-            Selected = 0x000010000,
-            /// <summary>get only specified attributes</summary>
-            Attr_Specified = 0x000020000,
-            /// <summary>get large icon</summary>
-            LargeIcon = 0x000000000,
-            /// <summary>get small icon</summary>
-            SmallIcon = 0x000000001,
-            /// <summary>get open icon</summary>
-            OpenIcon = 0x000000002,
-            /// <summary>get shell size icon</summary>
-            ShellIconSize = 0x000000004,
-            /// <summary>pszPath is a pidl</summary>
-            PIDL = 0x000000008,
-            /// <summary>use passed dwFileAttribute</summary>
-            UseFileAttributes = 0x000000010,
-            /// <summary>apply the appropriate overlays</summary>
-            AddOverlays = 0x000000020,
-            /// <summary>Get the index of the overlay in the upper 8 bits of the iIcon</summary>
-            OverlayIndex = 0x000000040,
-        }
-        #endregion
-
-        #region Structs
-        [StructLayout(LayoutKind.Sequential)]
-        public struct SHFILEINFO
-        {
-            public const int NAMESIZE = 80;
-            public nint hIcon;
-            public int iIcon;
-            public uint dwAttributes;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string szDisplayName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-            public string szTypeName;
-        };
-
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct RECT
-        {
-            public int left, top, right, bottom;
+            SIIGBF_RESIZETOFIT = 0x00,
+            SIIGBF_BIGGERSIZEOK = 0x01,
+            SIIGBF_MEMORYONLY = 0x02,
+            SIIGBF_ICONONLY = 0x04,
+            SIIGBF_THUMBNAILONLY = 0x08,
+            SIIGBF_INCACHEONLY = 0x10
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct POINT
+        public struct SIZE
         {
-            int x;
-            int y;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct IMAGELISTDRAWPARAMS
-        {
-            public int cbSize;
-            public nint himl;
-            public int i;
-            public nint hdcDst;
-            public int x;
-            public int y;
             public int cx;
             public int cy;
-            public int xBitmap;    // x offest from the upperleft of bitmap
-            public int yBitmap;    // y offset from the upperleft of bitmap
-            public int rgbBk;
-            public int rgbFg;
-            public int fStyle;
-            public int dwRop;
-            public int fState;
-            public int Frame;
-            public int crEffect;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct IMAGEINFO
-        {
-            public nint hbmImage;
-            public nint hbmMask;
-            public int Unused1;
-            public int Unused2;
-            public RECT rcImage;
-        }
-        #endregion
-
-        #region IImageList
-        [ComImport()]
-        [Guid("46EB5926-582E-4017-9FDF-E8998DAA0950")]
+        [ComImport]
+        [Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface IImageList
+        private interface IShellItemImageFactory
         {
-            [PreserveSig]
-            int Add(
-            nint hbmImage,
-            nint hbmMask,
-            ref int pi);
+            void GetImage(SIZE size, SIIGBF flags, out IntPtr phbm);
+        }
 
-            [PreserveSig]
-            int ReplaceIcon(
-            int i,
-            nint hicon,
-            ref int pi);
+        [ComImport]
+        [Guid("43826D1E-E718-42EE-BC55-A1E261C37BFE")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IShellItem
+        {
+        }
 
-            [PreserveSig]
-            int SetOverlayImage(
-            int iImage,
-            int iOverlay);
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
+        private static extern void SHCreateItemFromParsingName(
+            [In][MarshalAs(UnmanagedType.LPWStr)] string pszPath,
+            IntPtr pbc,
+            [In] ref Guid riid,
+            [Out][MarshalAs(UnmanagedType.Interface)] out IShellItem shellItem);
 
-            [PreserveSig]
-            int Replace(
-            int i,
-            nint hbmImage,
-            nint hbmMask);
+        [DllImport("gdi32.dll")]
+        private static extern bool DeleteObject(IntPtr hObject);
 
-            [PreserveSig]
-            int AddMasked(
-            nint hbmImage,
-            int crMask,
-            ref int pi);
+        /// <summary>
+        /// 提取指定路径的图标位图
+        /// </summary>
+        /// <param name="path">文件路径或虚拟路径（如 shell:::{CLSID}）</param>
+        /// <param name="size">图标大小（如 16, 32, 48, 64, 128, 256）</param>
+        /// <returns>Bitmap 图标对象</returns>
+        public static Bitmap GetIconBitmap(string pathOrExtension,int size)
+        {
+            if (string.IsNullOrWhiteSpace(pathOrExtension))
+                throw new ArgumentException("路径不能为空");
 
-            [PreserveSig]
-            int Draw(
-            ref IMAGELISTDRAWPARAMS pimldp);
+            // 如果只提供了扩展名，则生成一个虚拟文件路径
+            string path;
+            SIIGBF siigbf;
+            if (pathOrExtension.StartsWith("."))
+            {
+                siigbf = SIIGBF.SIIGBF_ICONONLY | SIIGBF.SIIGBF_BIGGERSIZEOK;
+                // 创建一个临时文件以确保路径存在
+                string tempDir = Path.Combine(Path.GetTempPath(), "ShellIconTemp");
+                Directory.CreateDirectory(tempDir);
+                path = Path.Combine(tempDir, "dummy" + pathOrExtension);
+                if (!File.Exists(path))
+                {
+                    File.WriteAllText(path, string.Empty);
+                }
+            }
+            else
+            {
+                path = pathOrExtension;
+                siigbf = SIIGBF.SIIGBF_BIGGERSIZEOK;
+            }
 
-            [PreserveSig]
-            int Remove(
-        int i);
+            var iid = typeof(IShellItemImageFactory).GUID;
 
-            [PreserveSig]
-            int GetIcon(
-            int i,
-            int flags,
-            ref nint picon);
+            try
+            {
+                SHCreateItemFromParsingName(path, IntPtr.Zero, ref iid, out var shellItem);
+                var factory = (IShellItemImageFactory)shellItem;
 
-            [PreserveSig]
-            int GetImageInfo(
-            int i,
-            ref IMAGEINFO pImageInfo);
+                var iconSize = new SIZE { cx = size, cy = size };
+                factory.GetImage(iconSize, siigbf, out var hBitmap);
 
-            [PreserveSig]
-            int Copy(
-            int iDst,
-            IImageList punkSrc,
-            int iSrc,
-            int uFlags);
+                if (hBitmap != IntPtr.Zero)
+                {
+                    var bmp = Image.FromHbitmap(hBitmap);
+                    DeleteObject(hBitmap);
+                    return bmp;
+                }
+            }
+            catch
+            {
+                // 返回 null 表示失败
+            }
 
-            [PreserveSig]
-            int Merge(
-            int i1,
-            IImageList punk2,
-            int i2,
-            int dx,
-            int dy,
-            ref Guid riid,
-            ref nint ppv);
+            return null;
+        }
 
-            [PreserveSig]
-            int Clone(
-            ref Guid riid,
-            ref nint ppv);
+        ///// <summary>
+        ///// 提取指定路径的图标位图
+        ///// </summary>
+        ///// <param name="path">文件路径或虚拟路径（如 shell:::{CLSID}）</param>
+        ///// <param name="size">图标大小（如 16, 32, 48, 64, 128, 256）</param>
+        ///// <returns>Bitmap 图标对象</returns>
+        //public static Bitmap GetIconBitmap(string path, int size = 256)
+        //{
+        //    var iidImageFactory = typeof(IShellItemImageFactory).GUID;
 
-            [PreserveSig]
-            int GetImageRect(
-            int i,
-            ref RECT prc);
+        //    try
+        //    {
+        //        SHCreateItemFromParsingName(path, IntPtr.Zero, ref iidImageFactory, out var shellItem);
+        //        var factory = (IShellItemImageFactory)shellItem;
 
-            [PreserveSig]
-            int GetIconSize(
-            ref int cx,
-            ref int cy);
+        //        var iconSize = new SIZE { cx = size, cy = size };
+        //        factory.GetImage(iconSize, SIIGBF.SIIGBF_BIGGERSIZEOK, out var hBitmap);
 
-            [PreserveSig]
-            int SetIconSize(
-            int cx,
-            int cy);
+        //        if (hBitmap != IntPtr.Zero)
+        //        {
+        //            var bmp = Image.FromHbitmap(hBitmap);
+        //            DeleteObject(hBitmap);
+        //            return bmp;
+        //        }
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        // 忽略错误（路径错误、虚拟项不可获取等）
+        //    }
 
-            [PreserveSig]
-            int GetImageCount(
-        ref int pi);
+        //    return null;
+        //}
 
-            [PreserveSig]
-            int SetImageCount(
-            int uNewCount);
 
-            [PreserveSig]
-            int SetBkColor(
-            int clrBk,
-            ref int pclr);
+        ///// <summary>
+        ///// 提取文件路径或扩展名的默认图标（非缩略图）
+        ///// </summary>
+        ///// <param name="pathOrExtension">完整路径或 .扩展名（如 .png）</param>
+        ///// <param name="size">目标图标大小</param>
+        ///// <returns>Bitmap 图标对象</returns>
+        //public static Bitmap GetDefaultIcon(string pathOrExtension, int size = 256)
+        //{
+        //    if (string.IsNullOrWhiteSpace(pathOrExtension))
+        //        throw new ArgumentException("路径不能为空");
 
-            [PreserveSig]
-            int GetBkColor(
-            ref int pclr);
+        //    // 如果只提供了扩展名，则生成一个虚拟文件路径
+        //    string path = string.Empty;
+        //    if (pathOrExtension.StartsWith("."))
+        //    {
+        //        // 创建一个临时文件以确保路径存在
+        //        string tempDir = Path.Combine(Path.GetTempPath(), "ShellIconTemp");
+        //        Directory.CreateDirectory(tempDir);
+        //        path = Path.Combine(tempDir, "dummy" + pathOrExtension);
+        //        if (!File.Exists(path))
+        //        {
+        //            File.WriteAllText(path, string.Empty);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        path = pathOrExtension;
+        //    }
 
-            [PreserveSig]
-            int BeginDrag(
-            int iTrack,
-            int dxHotspot,
-            int dyHotspot);
+        //    var iid = typeof(IShellItemImageFactory).GUID;
+        //    try
+        //    {
+        //        SHCreateItemFromParsingName(path, IntPtr.Zero, ref iid, out var shellItem);
+        //        var factory = (IShellItemImageFactory)shellItem;
 
-            [PreserveSig]
-            int EndDrag();
+        //        var iconSize = new SIZE { cx = size, cy = size };
+        //        factory.GetImage(iconSize, SIIGBF.SIIGBF_ICONONLY | SIIGBF.SIIGBF_BIGGERSIZEOK, out var hBitmap);
 
-            [PreserveSig]
-            int DragEnter(
-            nint hwndLock,
-            int x,
-            int y);
+        //        if (hBitmap != IntPtr.Zero)
+        //        {
+        //            var bmp = Image.FromHbitmap(hBitmap);
+        //            DeleteObject(hBitmap);
+        //            return bmp;
+        //        }
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        // 返回 null 表示失败
+        //    }
 
-            [PreserveSig]
-            int DragLeave(
-            nint hwndLock);
+        //    return null;
+        //}
 
-            [PreserveSig]
-            int DragMove(
-            int x,
-            int y);
-
-            [PreserveSig]
-            int SetDragCursorImage(
-            ref IImageList punk,
-            int iDrag,
-            int dxHotspot,
-            int dyHotspot);
-
-            [PreserveSig]
-            int DragShowNolock(
-            int fShow);
-
-            [PreserveSig]
-            int GetDragImage(
-            ref POINT ppt,
-            ref POINT pptHotspot,
-            ref Guid riid,
-            ref nint ppv);
-
-            [PreserveSig]
-            int GetItemFlags(
-            int i,
-            ref int dwFlags);
-
-            [PreserveSig]
-            int GetOverlayImage(
-            int iOverlay,
-            ref int piIndex);
-        };
-        #endregion
     }
 }
