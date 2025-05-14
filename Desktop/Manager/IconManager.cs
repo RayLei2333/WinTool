@@ -29,7 +29,7 @@ namespace Desktop.Manager
         /// <summary>
         /// 所有图片格式的缓存
         /// </summary>
-        public static List<string> ImageFormats { get; set; } = new List<string>();
+        public static List<string> ImageFormats { get; set; }
 
 
         /// <summary>
@@ -51,6 +51,7 @@ namespace Desktop.Manager
 
         public IconManager()
         {
+            ImageFormats = new List<string>();
             ImageCodecInfo[] imageEncoders = ImageCodecInfo.GetImageEncoders();
             foreach (ImageCodecInfo encoder in imageEncoders)
             {

@@ -104,21 +104,21 @@
                             <!--设置菜单项为可勾选-->
                             <Button.ContextMenu>
                                 <ContextMenu x:Name="MenuContextMenu">
-                                    <MenuItem Header="列表显示" IsCheckable="True" IsChecked="{Binding ViewType, Mode=OneWay, Converter={StaticResource ValueEqualsConverter},ConverterParameter=1}" Tag="1" >
+                                    <MenuItem Header="列表显示" IsCheckable="True" IsChecked="{Binding ViewType, Mode=OneWay, Converter={StaticResource ValueEqualsConverter},ConverterParameter=16}" Tag="16" >
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="Click">
                                                 <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </MenuItem>
-                                    <MenuItem Header="小图标显示" IsCheckable="True" IsChecked="{Binding ViewType, Mode=OneWay, Converter={StaticResource ValueEqualsConverter}, ConverterParameter=2}" Tag="2">
+                                    <MenuItem Header="小图标显示" IsCheckable="True" IsChecked="{Binding ViewType, Mode=OneWay, Converter={StaticResource ValueEqualsConverter}, ConverterParameter=32}" Tag="32">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="Click">
                                                 <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </MenuItem>
-                                    <MenuItem Header="大图标显示" IsCheckable="True" IsChecked="{Binding ViewType, Mode=OneWay, Converter={StaticResource ValueEqualsConverter}, ConverterParameter=3}" Tag="3">
+                                    <MenuItem Header="大图标显示" IsCheckable="True" IsChecked="{Binding ViewType, Mode=OneWay, Converter={StaticResource ValueEqualsConverter}, ConverterParameter=64}" Tag="64">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="Click">
                                                 <i:InvokeCommandAction Command="{Binding ViewTypeItemClickCommand}" PassEventArgsToCommand="True" />
