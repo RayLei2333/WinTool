@@ -1,12 +1,15 @@
 ﻿using Desktop.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using static Desktop.Win32Support.ShellContextMenu;
 
 namespace Desktop.Win32Support
 {
@@ -90,6 +93,8 @@ namespace Desktop.Win32Support
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, int dwSize, out IntPtr lpNumberOfBytesWritten);
 
+        [DllImport("shell32.dll")]
+        private static extern int SHGetDesktopFolder(out nint ppshf);
         #endregion
 
         #region Structs
@@ -336,6 +341,167 @@ namespace Desktop.Win32Support
             CloseHandle(hProcess);
 
             return desktopIconList;
+        }
+
+        public static List<DesktopIconInfo> GetDesktopIcon3()
+        {
+            var result = new List<DesktopIconInfo>();
+            var listView = FindSysListView32();
+            int nResult = SHGetDesktopFolder(out nint pUnkownDesktopFolder);
+            if (0 != nResult)
+            {
+                throw new ShellContextMenuException("Failed to get the desktop shell folder");
+            }
+            IShellFolder desktopFolder = (IShellFolder)Marshal.GetTypedObjectForIUnknown(pUnkownDesktopFolder, typeof(IShellFolder));
+            // 枚举桌面图标的 PIDL
+            desktopFolder.EnumObjects(IntPtr.Zero, SHCONTF.FOLDERS | SHCONTF.NONFOLDERS | SHCONTF.INCLUDEHIDDEN, out IEnumIDList enumIDList);
+            //desktopFolder.EnumObjects(IntPtr.Zero,  SHCONTF.NONFOLDERS , out IEnumIDList enumIDList);
+            int index = 0;
+            IntPtr pidl;
+            uint fetched;
+            _ = GetWindowThreadProcessId(listView, out int processId);
+            IntPtr hProcess = OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION, false, processId);
+            IntPtr remoteBuffer = VirtualAllocEx(hProcess, IntPtr.Zero, 4096, MEM_COMMIT, PAGE_READWRITE);
+
+            while (enumIDList.Next(1, out pidl, out fetched) == 0 && fetched == 1)
+            {
+                STRRET strret;
+                desktopFolder.GetDisplayNameOf(pidl, SHGDN_NORMAL, out strret);
+                //文件名
+                string name = GetDisplayName(ref strret, pidl);
+
+                desktopFolder.GetDisplayNameOf(pidl, SHGDN_FORPARSING, out strret);
+                //路径
+                string parsing = GetDisplayName(ref strret, pidl);
+
+                IntPtr positionBuffer = remoteBuffer;
+                SendMessage(listView, LVM_GETITEMPOSITION, (uint)index, positionBuffer);
+
+                byte[] posData = new byte[8]; // 2x int
+                ReadProcessMemory(hProcess, positionBuffer, posData, posData.Length, out _);
+                int x = BitConverter.ToInt32(posData, 0);
+                int y = BitConverter.ToInt32(posData, 4);
+
+                //POINT pt = new POINT();
+                //if (!SafeGetItemPosition(listView, index, out pt))
+                //{
+                //    pt.X = pt.Y = -1;
+                //}
+
+                result.Add(new DesktopIconInfo
+                {
+                    Name = name,
+                    FilePath = parsing,
+                    X = x,
+                    Y = y
+                });
+
+                Marshal.FreeCoTaskMem(pidl);
+                index++;
+            }
+            return result;
+        }
+
+
+        [DllImport("user32.dll")]
+        private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, ref POINT lParam);
+
+        private static bool SafeGetItemPosition(IntPtr listView, int index, out POINT pt)
+        {
+            pt = new POINT();
+            IntPtr result;
+            IntPtr success = SendMessageTimeout(
+                listView,
+                LVM_GETITEMPOSITION,
+                index,
+                ref pt,
+                SMTO_ABORTIFHUNG,
+                1000,
+                out result
+            );
+            return success != IntPtr.Zero;
+        }
+
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr SendMessageTimeout(
+    IntPtr hWnd,
+    uint Msg,
+    int wParam,
+    ref POINT lParam,
+    uint fuFlags,
+    uint uTimeout,
+    out IntPtr lpdwResult
+);
+        private const uint SMTO_ABORTIFHUNG = 0x0002;
+        private const uint SHGDN_NORMAL = 0x0000;
+        private const uint SHGDN_FORPARSING = 0x8000;
+
+        private static string GetDisplayName(ref STRRET strret, IntPtr pidl)
+        {
+            StringBuilder sb = new StringBuilder(260);
+            StrRetToBuf(ref strret, pidl, sb, (uint)sb.Capacity);
+            return sb.ToString();
+        }
+
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+        private static extern int StrRetToBuf(ref STRRET pstr, IntPtr pidl, StringBuilder pszBuf, uint cchBuf);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT { public int X, Y; }
+
+        [StructLayout(LayoutKind.Explicit, Size = 520)]
+        public struct STRRET
+        {
+            [FieldOffset(0)] public uint uType;
+            [FieldOffset(4)] public IntPtr pOleStr;
+        }
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("000214F2-0000-0000-C000-000000000046")]
+        public interface IEnumIDList
+        {
+            [PreserveSig]
+            int Next(uint celt, out IntPtr rgelt, out uint pceltFetched);
+            void Skip(uint celt);
+            void Reset();
+            void Clone(out IEnumIDList ppenum);
+        }
+
+        [Flags]
+        public enum SHCONTF
+        {
+            FOLDERS = 0x0020,
+            NONFOLDERS = 0x0040,
+            INCLUDEHIDDEN = 0x0080
+        }
+
+        [Flags]
+        public enum SFGAO : uint
+        {
+            SFGAO_CANCOPY = 0x00000001,
+            SFGAO_CANMOVE = 0x00000002,
+            SFGAO_CANLINK = 0x00000004,
+            SFGAO_CANRENAME = 0x00000010,
+            SFGAO_CANDELETE = 0x00000020,
+            SFGAO_HASPROPSHEET = 0x00000040,
+        }
+
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("000214E6-0000-0000-C000-000000000046")]
+        public interface IShellFolder
+        {
+            void ParseDisplayName(IntPtr hwnd, IntPtr pbc, [MarshalAs(UnmanagedType.LPWStr)] string pszDisplayName, out uint pchEaten, out IntPtr ppidl, ref uint pdwAttributes);
+            void EnumObjects(IntPtr hwnd, SHCONTF grfFlags, out IEnumIDList ppenumIDList);
+            void BindToObject(IntPtr pidl, IntPtr pbc, [In] ref Guid riid, out IntPtr ppv);
+            void BindToStorage(IntPtr pidl, IntPtr pbc, [In] ref Guid riid, out IntPtr ppv);
+            void CompareIDs(IntPtr lParam, IntPtr pidl1, IntPtr pidl2);
+            void CreateViewObject(IntPtr hwndOwner, [In] ref Guid riid, out IntPtr ppv);
+            void GetAttributesOf(uint cidl, [In] IntPtr apidl, ref SFGAO rgfInOut);
+            void GetUIObjectOf(IntPtr hwndOwner, uint cidl, [In] ref IntPtr apidl, [In] ref Guid riid, IntPtr rgfReserved, out IntPtr ppv);
+            void GetDisplayNameOf(IntPtr pidl, uint uFlags, out STRRET pName);
+            void SetNameOf(IntPtr hwnd, IntPtr pidl, [MarshalAs(UnmanagedType.LPWStr)] string pszName, uint uFlags, out IntPtr ppidlOut);
         }
     }
 }

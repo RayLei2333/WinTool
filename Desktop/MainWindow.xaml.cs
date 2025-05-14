@@ -36,7 +36,7 @@ namespace Desktop
             Width = SystemParameters.WorkArea.Width;
             Height = SystemParameters.WorkArea.Height;
             this.DataContext = ViewModel;
-
+            DesktopManager.Instence.GetAllDesktopFile();
 
             #region Test Data
             List<string> tmpFilePaths = new List<string>()

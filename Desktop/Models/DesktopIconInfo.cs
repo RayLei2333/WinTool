@@ -15,5 +15,9 @@ namespace Desktop.Models
         public int X { get; set; }
 
         public int Y { get; set; }
+
+        public string FilePath { get; set; }
+
+        public bool IsShortcut { get; set; }
     }
 }
