@@ -1,5 +1,4 @@
 ﻿using Desktop.Models;
-using Desktop.Win32Support;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using static Desktop.Win32Support.ImageFileThumbnail;
+using Win32Support;
 
 namespace Desktop.Manager
 {

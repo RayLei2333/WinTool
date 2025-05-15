@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -16,8 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Desktop.Models;
-using Desktop.Win32Support;
-using static Desktop.Win32Support.ImageFileThumbnail;
+using Win32Support;
 
 namespace Desktop
 {
@@ -45,14 +45,14 @@ namespace Desktop
 
         private void fileRightMenuBtn_Click(object sender, RoutedEventArgs e)
         {
-            string testFilePath = @"C:\Users\10475\Desktop\wb.json";
+            string testFilePath = @"C:\Users\23162\Desktop\清晰度检测.cs";
             FileInfo[] files = new FileInfo[1] { new FileInfo(testFilePath) };
             _ctxMnu.ShowContextMenu(files, GetMousePosition());
         }
 
         private void folderRightMenuBtn_Click(object sender, RoutedEventArgs e)
         {
-            string path = @"C:\Users\10475\Desktop\PSD";
+            string path = @"C:\Users\23162\Desktop\B19 RPA资料";
             DirectoryInfo[] arrFI = [new DirectoryInfo(path)];
             _ctxMnu.ShowContextMenu(arrFI, GetMousePosition());
         }
@@ -278,12 +278,18 @@ namespace Desktop
 
         private void desktopAllFileBtn_Click(object sender, RoutedEventArgs e)
         {
-            var list = DesktopWindow.GetDesktopIcon();
+            // 创建并启动一个 Stopwatch 实例
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            var list = DesktopWindow.GetDesktopFiles();
             int index = 1;
             foreach (var item in list)
             {
-                AppendLog($"[{index++}],{item.Name},[{item.X},{item.Y}]");
+                AppendLog($"[{index++}],{item.Name},[{item.X},{item.Y}],{item.FilePath}");
             }
+
+            stopwatch.Stop();
+            AppendLog($"耗时: {stopwatch.ElapsedMilliseconds} 毫秒");
         }
     }
 }

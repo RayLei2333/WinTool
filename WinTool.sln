@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{93EBFE3F-B885-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Desktop", "Desktop\Desktop.csproj", "{56D28D03-7522-461D-9442-90F779156B7B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Win32Support", "Win32Support\Win32Support.csproj", "{4869782D-81C7-4AE5-8258-2008A5E8E514}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{56D28D03-7522-461D-9442-90F779156B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56D28D03-7522-461D-9442-90F779156B7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56D28D03-7522-461D-9442-90F779156B7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4869782D-81C7-4AE5-8258-2008A5E8E514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4869782D-81C7-4AE5-8258-2008A5E8E514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4869782D-81C7-4AE5-8258-2008A5E8E514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4869782D-81C7-4AE5-8258-2008A5E8E514}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

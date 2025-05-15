@@ -2,7 +2,6 @@
 using Desktop.Manager;
 using Desktop.ViewModel;
 using Desktop.Views;
-using Desktop.Win32Support;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -15,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Win32Support;
 
 namespace Desktop
 {
@@ -24,7 +24,7 @@ namespace Desktop
     public partial class MainWindow : Window
     {
         private ShellContextMenu _ctxMnu = new();
-        private DesktopWindow _desktopWindow = new();
+        //private DesktopWindow _desktopWindow = new();
         private FileSystemWatcher _fileSystemWatcher = new();
         public MainWindowViewModel ViewModel = new MainWindowViewModel();
 
@@ -100,7 +100,7 @@ namespace Desktop
 
         private void OnActivated(object sender, EventArgs e)
         {
-            _desktopWindow.UpdateDesktopWindow(new WindowInteropHelper(this).Handle);
+            //_desktopWindow.UpdateDesktopWindow(new WindowInteropHelper(this).Handle);
         }
 
     }
