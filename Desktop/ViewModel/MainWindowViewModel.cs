@@ -58,6 +58,16 @@ namespace Desktop.ViewModel
             {
                 _blockManager.AddBlock(100, "测试块1");
             }
+
+            BlockManager.Instence.ResetFileList();
+            var fileList = Blocks.SelectMany(t => t.FileList).ToList();
+            fileList.AddRange(DesktopManager.Instence.DesktopData.FileData.ToList<FileData>());
+            IconManager.Instence.SetIcon(fileList);
+
+            foreach (var item in DesktopFile)
+            {
+                item.Icon = IconManager.Instence.GetIcon(ViewType.Bigg, item.FullPath)?.Icon;
+            }
         }
 
         private void SetBackground()

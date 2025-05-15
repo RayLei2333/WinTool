@@ -82,14 +82,14 @@ namespace Desktop.Manager
                 DesktopData.FileData.Add(new DesktopFileData()
                 {
                     FullPath = item.FilePath,
-                    X = item.X,
-                    Y = item.Y,
+                    X = item.X - 3,
+                    Y = item.Y + 2,
                     Seq = item.Index,
                     Name = item.Name,
                     IsFolder = Directory.Exists(item.FilePath),
                     IsLnkFile = extension.CheckIsLnkFileSuffix(),
                     IsImageFile = extension.CheckIsImgFileSuffix(),
-                    Suffix = extension,
+                    Suffix = item.FilePath.StartsWith("::") ? item.FilePath : extension,
                 });
             }
         }
@@ -104,7 +104,7 @@ namespace Desktop.Manager
                 watcher.Path = watchPaths[i];
                 watcher.Filter = "*.*";
                 watcher.Error += OnFileError;
-                watcher.Changed+= OnFileChanged;
+                watcher.Changed += OnFileChanged;
                 watcher.Created += OnFileCreate;
                 watcher.Deleted += OnFileDelete;
                 watcher.Renamed += OnFileRenamed;

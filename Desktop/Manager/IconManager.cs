@@ -38,7 +38,9 @@ namespace Desktop.Manager
         {
             [ViewType.List] = new List<IconInfo>(),
             [ViewType.SmallIcon] = new List<IconInfo>(),
-            [ViewType.LargeIcon] = new List<IconInfo>()
+            [ViewType.LargeIcon] = new List<IconInfo>(),
+            [ViewType.Bigg] = new List<IconInfo>(),
+            [ViewType.BIGGGG] = new List<IconInfo>()
         };
 
         //默认后缀缓存
@@ -86,7 +88,7 @@ namespace Desktop.Manager
                 IconInfo iconInfo = new IconInfo()
                 {
                     Suffix = suffix,
-                    Icon = IconExtractor.GetIconBitmap(suffix, (int)item.Key).ToImageSource()
+                    Icon = IconExtractor.GetIconBitmap(suffix, (int)item.Key)
                 };
                 item.Value.Add(iconInfo);
             }
@@ -97,7 +99,7 @@ namespace Desktop.Manager
             foreach (var item in _iconListDic)
             {
                 IconInfo iconInfo = suffix.Clone();
-                iconInfo.Icon = IconExtractor.GetIconBitmap(iconInfo.FullPath, (int)item.Key).ToImageSource();
+                iconInfo.Icon = IconExtractor.GetIconBitmap(iconInfo.FullPath, (int)item.Key);
                 item.Value.Add(iconInfo);
             }
         }
@@ -115,6 +117,11 @@ namespace Desktop.Manager
                 return pszFile.CheckIsLnkFileSuffix()
                     ? null
                     : FindIconByExtension(list, pszFile);
+            }
+
+            if (pszFile.StartsWith("::"))
+            {
+                return FindIconByExtension(list, pszFile);
             }
 
             // 处理完整路径情况

@@ -26,12 +26,10 @@
     </Window.Resources>
 
     <Grid>
-        <WrapPanel x:Name="wrapper">
-
-        </WrapPanel>
 
 
-        <ListView ItemsSource="{Binding DesktopFile}" Padding="0" Margin="0">
+        <!--自由布局-->
+        <ListView ItemsSource="{Binding DesktopFile}" Padding="0" Margin="0" Background="Transparent" BorderThickness="0">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas />
@@ -44,17 +42,20 @@
                     <Setter Property="Margin" Value="0"/>
                     <Setter Property="Padding" Value="0"/>
                     <Setter Property="BorderThickness" Value="0"/>
+                    
                 </Style>
-                
             </ItemsControl.ItemContainerStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <!--<Border Width="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}">-->
-                    <StackPanel Width="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}">
-                        <!--<Image Source="{Binding Icon}" Width="40" Height="40"/>-->
-                        <TextBlock Text="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" TextAlignment="Center"/>
-                    </StackPanel>
-                    <!--</Border>-->
+                    <Border Width="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" 
+                            Height="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}">
+                        <StackPanel Orientation="Vertical">
+                            <Image Source="{Binding Icon}" Stretch="Uniform" Width="44" HorizontalAlignment="Center" VerticalAlignment="Center"></Image>
+                                <TextBlock Text="{Binding Name}" TextAlignment="Center" Foreground="#fff" />
+                        </StackPanel>
+                        <!--<Image></Image>
+                        <TextBlock Text="{Binding Name}" TextAlignment="Center"/>-->
+                    </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ListView>
@@ -80,5 +81,8 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>-->
+        <WrapPanel x:Name="wrapper">
+
+        </WrapPanel>
     </Grid>
 </Window>

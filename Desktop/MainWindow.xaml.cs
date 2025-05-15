@@ -38,32 +38,32 @@ namespace Desktop
             this.DataContext = ViewModel;
 
             #region Test Data
-            List<string> tmpFilePaths = new List<string>()
-            {
-                //@"C:\Users\23162\Desktop\WarningLight.cs",
-                //@"C:\Users\23162\Desktop\清晰度检测.cs",
-                @"C:\Users\23162\Desktop\test.bmp",
-                //@"C:\Users\23162\Desktop\Config-EFEM",
-                //@"C:\Users\23162\Desktop\doc.lnk"
-                //@"C:\Users\10475\Desktop\wb.json",
-                //@"C:\Users\10475\Desktop\Visual Studio 2022.lnk",
-                //@"C:\Users\10475\Desktop\Visual Studio Code.lnk"
-            };
-            ViewModel.Blocks[0].FilePathList = tmpFilePaths;
-            BlockManager.Instence.ResetFileList();
-            var fileList = ViewModel.Blocks.SelectMany(t => t.FileList).ToList();
-            IconManager.Instence.SetIcon(fileList);
+            //List<string> tmpFilePaths = new List<string>()
+            //{
+            //    //@"C:\Users\23162\Desktop\WarningLight.cs",
+            //    //@"C:\Users\23162\Desktop\清晰度检测.cs",
+            //    @"C:\Users\23162\Desktop\test.bmp",
+            //    //@"C:\Users\23162\Desktop\Config-EFEM",
+            //    //@"C:\Users\23162\Desktop\doc.lnk"
+            //    //@"C:\Users\10475\Desktop\wb.json",
+            //    //@"C:\Users\10475\Desktop\Visual Studio 2022.lnk",
+            //    //@"C:\Users\10475\Desktop\Visual Studio Code.lnk"
+            //};
+            //ViewModel.Blocks[0].FilePathList = tmpFilePaths;
+            //BlockManager.Instence.ResetFileList();
+            //var fileList = ViewModel.Blocks.SelectMany(t => t.FileList).ToList();
+            //IconManager.Instence.SetIcon(fileList);
             #endregion
 
             //init block
-            foreach (var item in ViewModel.Blocks)
-            {
-                var vm = new BlockItemViewModel(item);
-                vm.JustSaveEvent += ViewModel.JustSaveEvent;
-                BlockItem block = new BlockItem(vm);
+            //foreach (var item in ViewModel.Blocks)
+            //{
+            //    var vm = new BlockItemViewModel(item);
+            //    vm.JustSaveEvent += ViewModel.JustSaveEvent;
+            //    BlockItem block = new BlockItem(vm);
 
-                wrapper.Children.Add(block);
-            }
+            //    wrapper.Children.Add(block);
+            //}
 
             //获取桌面文件夹中的所有文件的图标
 

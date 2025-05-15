@@ -149,8 +149,8 @@ namespace Desktop.Win32Support
             {
                 AutoArrange = ((extendedStyle.ToInt32() & DesktopConstant.LVS_AUTOARRANGE) == DesktopConstant.LVS_AUTOARRANGE),
                 AlignedToGrid = ((extendedStyle.ToInt32() & DesktopConstant.LVS_SNAPTOGRID) == DesktopConstant.LVS_SNAPTOGRID),
-                X = x,
-                Y = y,
+                X = xReal,
+                Y = yReal,
             };
         }
 

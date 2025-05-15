@@ -19,6 +19,10 @@ namespace Desktop
         /// <summary>
         /// 大图标视图
         /// </summary>
-        LargeIcon = 64
+        LargeIcon = 64,
+
+        Bigg = 128,
+
+        BIGGGG = 256
     }
 }

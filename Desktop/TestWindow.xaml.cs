@@ -127,20 +127,34 @@ namespace Desktop
             foreach (var item in iconSizeList)
             {
                 var icon = IconExtractor.GetIconBitmap(testFloderPath, item);
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(icon));
+
+                using (var stream = new FileStream(@$"C:\Users\23162\Desktop\test\folder_{item}.png", FileMode.Create))
+                {
+                    encoder.Save(stream);
+                }
                 //var bmp = icon.ToBitmap();
-                icon.Save(@$"C:\Users\23162\Desktop\test\folder_{item}.png");
+                //icon.Save(@$"C:\Users\23162\Desktop\test\folder_{item}.png");
             }
 
         }
 
         private void fileLnkIconBtn_Click(object sender, RoutedEventArgs e)
         {
-            string testFilePath = @"C:\Users\23162\Desktop\Visual Studio 2022.lnk";
+            string testFilePath = @"C:\Users\10475\Desktop\Visual Studio 2022.lnk";
             foreach (var item in iconSizeList)
             {
                 var icon = IconExtractor.GetIconBitmap(testFilePath, item);
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(icon));
+
+                using (var stream = new FileStream(@$"C:\Users\10475\Desktop\test\lnkfile_{item}.png", FileMode.Create))
+                {
+                    encoder.Save(stream);
+                }
                 //var bmp = icon.ToBitmap();
-                icon.Save(@$"C:\Users\23162\Desktop\test\lnkfile_{item}.png");
+                //icon.Save(@$"C:\Users\10475\Desktop\test\lnkfile_{item}.png");
             }
 
         }
@@ -152,7 +166,7 @@ namespace Desktop
             {
                 var icon = IconExtractor.GetIconBitmap(filePath, item);
                 //var bmp = icon.ToBitmap();
-                icon.Save(@$"C:\Users\23162\Desktop\test\imagefile_{item}.png");
+                //icon.Save(@$"C:\Users\23162\Desktop\test\imagefile_{item}.png");
             }
 
             //Guid guid = typeof(IShellItemImageFactory).GUID;
@@ -186,7 +200,7 @@ namespace Desktop
                 foreach (string s in list)
                 {
                     var icon = IconExtractor.GetIconBitmap(s, size);
-                    icon.Save(@$"C:\Users\23162\Desktop\test\{s}file_{size}.png");
+                   // icon.Save(@$"C:\Users\23162\Desktop\test\{s}file_{size}.png");
                 }
             }
         }
