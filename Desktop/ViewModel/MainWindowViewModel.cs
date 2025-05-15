@@ -9,7 +9,7 @@ using System.Windows.Media;
 using System.Collections.ObjectModel;
 using Desktop.Events;
 using Desktop.Manager;
-using Win32Support;
+using Desktop.Win32Support;
 
 namespace Desktop.ViewModel
 {

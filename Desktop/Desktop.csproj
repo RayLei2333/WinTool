@@ -24,8 +24,4 @@
 		<PackageReference Include="System.Drawing.Common" Version="9.0.5" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\Win32Support\Win32Support.csproj" />
-	</ItemGroup>
-
 </Project>

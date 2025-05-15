@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
@@ -44,6 +45,12 @@ namespace Desktop.Models
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// 排序
+        /// </summary>
+        public int Seq { get; set; }
+
+        [JsonIgnore]
         public ImageSource Icon { get; set; }
     }
 }

@@ -90,10 +90,6 @@ namespace Desktop.Manager
             {
                 string json = File.ReadAllText("data.json");
                 BlockData = JsonSerializer.Deserialize<List<BlockData>>(json);
-                //foreach (var block in BlockData)
-                //{
-                //    block.InitFileList();
-                //}
             }
         }
 

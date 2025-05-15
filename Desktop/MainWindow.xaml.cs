@@ -14,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Win32Support;
+using Desktop.Win32Support;
 
 namespace Desktop
 {
@@ -36,7 +36,6 @@ namespace Desktop
             Width = SystemParameters.WorkArea.Width;
             Height = SystemParameters.WorkArea.Height;
             this.DataContext = ViewModel;
-            DesktopManager.Instence.GetAllDesktopFile();
 
             #region Test Data
             List<string> tmpFilePaths = new List<string>()

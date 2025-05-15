@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Win32Support;
+using Desktop.Win32Support;
 
 namespace Desktop.Manager
 {

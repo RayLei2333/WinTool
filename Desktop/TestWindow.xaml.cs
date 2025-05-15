@@ -16,8 +16,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Desktop.Manager;
 using Desktop.Models;
-using Win32Support;
+using Desktop.Win32Support;
 
 namespace Desktop
 {
@@ -32,6 +33,7 @@ namespace Desktop
         public TestWindow()
         {
             InitializeComponent();
+            var a = DesktopManager.Instence;
             _log = log;
             _fileSystemWatcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             _fileSystemWatcher.Filter = "*.*";
