@@ -24,12 +24,61 @@
     <Window.Resources>
         <converts:ValueEqualsConverter x:Key="ValueEqualsConverter"></converts:ValueEqualsConverter>
     </Window.Resources>
-    
+
     <Grid>
         <WrapPanel x:Name="wrapper">
 
         </WrapPanel>
 
-        <Grid></Grid>
+
+        <ListView ItemsSource="{Binding DesktopFile}" Padding="0" Margin="0">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
+                
+            </ItemsControl.ItemContainerStyle>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <!--<Border Width="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}">-->
+                    <StackPanel Width="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}">
+                        <!--<Image Source="{Binding Icon}" Width="40" Height="40"/>-->
+                        <TextBlock Text="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" TextAlignment="Center"/>
+                    </StackPanel>
+                    <!--</Border>-->
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ListView>
+
+        <!--自动对齐网格-->
+        <!--<ListView ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding DesktopFile}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Margin" Value="10"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate >
+                    <Border Width="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" Height="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}">
+                        <TextBlock Text="{Binding Name}"></TextBlock>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>-->
     </Grid>
 </Window>

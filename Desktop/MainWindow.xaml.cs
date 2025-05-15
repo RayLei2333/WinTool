@@ -99,6 +99,7 @@ namespace Desktop
 
         private void OnActivated(object sender, EventArgs e)
         {
+            DesktopWindow.UpdateDesktopWindow(new WindowInteropHelper(this).Handle);
             //_desktopWindow.UpdateDesktopWindow(new WindowInteropHelper(this).Handle);
         }
 

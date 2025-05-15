@@ -3,6 +3,7 @@ using Desktop.Win32Support.Interfaces;
 using Desktop.Win32Support.Models;
 using Desktop.Win32Support.Structs;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -148,8 +149,8 @@ namespace Desktop.Win32Support
             {
                 AutoArrange = ((extendedStyle.ToInt32() & DesktopConstant.LVS_AUTOARRANGE) == DesktopConstant.LVS_AUTOARRANGE),
                 AlignedToGrid = ((extendedStyle.ToInt32() & DesktopConstant.LVS_SNAPTOGRID) == DesktopConstant.LVS_SNAPTOGRID),
-                X = xReal,
-                Y = yReal,
+                X = x,
+                Y = y,
             };
         }
 
@@ -184,6 +185,8 @@ namespace Desktop.Win32Support
 
             IntPtr remoteBuffer = Dlls.VirtualAllocEx(hProcess, IntPtr.Zero, 4096, DesktopConstant.MEM_COMMIT, DesktopConstant.PAGE_READWRITE);
 
+            float scale = GetDPI(listView);
+
             for (int i = 0; i < count; i++)
             {
                 // --- 获取位置 ---
@@ -194,6 +197,9 @@ namespace Desktop.Win32Support
                 Dlls.ReadProcessMemory(hProcess, positionBuffer, posData, posData.Length, out _);
                 int x = BitConverter.ToInt32(posData, 0);
                 int y = BitConverter.ToInt32(posData, 4);
+                //计算DPI
+                x = (int)(x / scale) - 14;
+                y = (int)(y / scale);
 
                 // --- 获取标题 ---
                 IntPtr textBuffer = remoteBuffer + 64; // 偏移64，避免覆盖
@@ -278,20 +284,20 @@ namespace Desktop.Win32Support
 
         }
 
-
-        ///// <summary>
-        ///// 将窗体置于底层，但为桌面上层
-        ///// </summary>
-        ///// <param name="hWndChild"></param>
-        //public void UpdateDesktopWindow(nint hWndChild)
-        //{
-        //    nint shellViewPtr = FindDesktopWindow();
-        //    if (shellViewPtr != nint.Zero && _shellViewPtr != shellViewPtr)
-        //    {
-        //        Dlls.SetParent(hWndChild, shellViewPtr);
-        //        _shellViewPtr = shellViewPtr;
-        //    }
-        //}
+        private static IntPtr _shellViewPtr;
+        /// <summary>
+        /// 将窗体置于底层，但为桌面上层
+        /// </summary>
+        /// <param name="hWndChild"></param>
+        public static void UpdateDesktopWindow(nint hWndChild)
+        {
+            nint shellViewPtr = FindDesktopWindow();
+            if (shellViewPtr != nint.Zero && _shellViewPtr != shellViewPtr)
+            {
+                Dlls.SetParent(hWndChild, shellViewPtr);
+                _shellViewPtr = shellViewPtr;
+            }
+        }
 
     }
 }

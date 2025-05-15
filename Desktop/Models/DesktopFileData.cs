@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Desktop.Models
 {
-    internal class DesktopFileData: FileData
+    public class DesktopFileData: FileData
     {
         public int X { get; set; }
 
