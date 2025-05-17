@@ -198,7 +198,7 @@ namespace Desktop.Win32Support
                 int x = BitConverter.ToInt32(posData, 0);
                 int y = BitConverter.ToInt32(posData, 4);
                 //计算DPI
-                x = (int)(x / scale) - 14;
+                x = (int)(x / scale);
                 y = (int)(y / scale);
 
                 // --- 获取标题 ---

@@ -50,6 +50,8 @@ namespace Desktop.ViewModel
             SetBackground();
             foreach (var item in DesktopManager.Instence.DesktopData.FileData)
             {
+                item.X = item.X - (item.X % DesktopManager.Instence.DesktopData.IconWidth) - 1;
+                item.Y = item.Y - (item.Y % DesktopManager.Instence.DesktopData.IconHeight);
                 DesktopFile.Add(item);
             }
 
