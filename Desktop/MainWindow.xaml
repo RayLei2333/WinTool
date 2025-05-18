@@ -6,6 +6,8 @@
         xmlns:local="clr-namespace:Desktop"
         xmlns:converts="clr-namespace:Desktop.Converters" 
         xmlns:controls="clr-namespace:Desktop.Views"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         mc:Ignorable="d"
         Title="MainWindow"
         Height="450" 
@@ -28,12 +30,8 @@
 
     <Grid>
 
-
-
-        <!--自由布局-->
-
-        <!--自由布局-->
-        <ListView ItemsSource="{Binding DesktopFile}" Padding="0" Margin="0,2,0,2" Background="Transparent" BorderThickness="0">
+        <!--自由布局 Margin="0,2,0,2"-->
+        <ListView ItemsSource="{Binding DesktopFile}" Padding="0"  Background="Transparent" BorderThickness="0">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas Margin="0" />
@@ -45,49 +43,32 @@
                     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
                     <Setter Property="Margin" Value="0,0,0,0"/>
                     <Setter Property="Padding" Value="0,0,0,0"/>
-                    <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
-                    <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
                     <Setter Property="BorderThickness" Value="0"></Setter>
+                    <Setter Property="Width" Value="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}"></Setter>
+                    <Setter Property="Canvas.ZIndex" Value="0" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Canvas.ZIndex" Value="1" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
             </ItemsControl.ItemContainerStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <!--<controls:DesktopIconLabel Text="{Binding Name}" Width="76" Height="60">
-                        
-                    </controls:DesktopIconLabel>-->
-                    <!--TextMaxWidth="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}"-->
-                    <controls:DesktopIconView IconSource="{Binding Icon}" 
-                                              IconName="{Binding Name}" 
+                    <controls:DesktopIconView x:Name="desktopIcon"
                                               Width="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              MaxHeight="{Binding DataContext.IconHeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              HorizontalAlignment="Stretch"
-                                              VerticalAlignment="Stretch"
-                                              ></controls:DesktopIconView>
-                    <!--<Grid Width="{Binding DataContext.IconWidth, RelativeSource={RelativeSource AncestorType=Window}}" 
-                          MaxHeight="{Binding DataContext.IconHeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                          MinHeight="60">
-                       
-                      
-                    </Grid>-->
+                                              IsSelected="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListViewItem}}"
+                                              MouseLeftButtonDown="desktopIcon_MouseLeftButtonDown">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding DataContext.DesktopFileDoubleClickCmd, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                       CommandParameter="{Binding}"></i:InvokeCommandAction>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </controls:DesktopIconView>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ListView>
-
-        <!--<StackPanel Orientation="Vertical">
-      <Image  Height="44"  Source="{Binding Icon}" Stretch="Uniform" VerticalAlignment="Top" HorizontalAlignment="Center" />
-
-      <TextBlock TextAlignment="Center"
-                 TextWrapping="Wrap"
-                 FontSize="12"
-                 MaxHeight="32"
-                 LineStackingStrategy="BlockLineHeight"
-                 LineHeight="16"
-                 TextTrimming="CharacterEllipsis"
-                 HorizontalAlignment="Center"
-                 Text="{Binding Name}"
-                 Foreground="#FFF"
-                 Margin="0,0,0,0"></TextBlock>
-  </StackPanel>-->
 
         <!--自动对齐网格-->
         <!--<ListView ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding DesktopFile}">

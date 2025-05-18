@@ -100,6 +100,10 @@ namespace Desktop.Manager
             {
                 IconInfo iconInfo = suffix.Clone();
                 iconInfo.Icon = IconExtractor.GetIconBitmap(iconInfo.FullPath, (int)item.Key);
+                if(iconInfo.Icon.Width < (int)item.Key)
+                {
+
+                }
                 item.Value.Add(iconInfo);
             }
         }
@@ -134,6 +138,10 @@ namespace Desktop.Manager
             {
                 string extension = Path.GetExtension(pszFile)?.ToLower() ?? string.Empty;
                 if (extension.CheckIsLnkFileSuffix())
+                {
+                    return FindIconByFile(list, pszFile);
+                }
+                else if (extension.CheckIsImgFileSuffix())
                 {
                     return FindIconByFile(list, pszFile);
                 }

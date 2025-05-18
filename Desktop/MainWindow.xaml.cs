@@ -31,6 +31,8 @@ namespace Desktop
         public MainWindow()
         {
             InitializeComponent();
+
+            var a = SystemFonts.MessageFontFamily;
             //SystemParameters.PrimaryScreenHeight 包含任务栏高度 
             //SystemParameters.PrimaryScreenWidth  
             Width = SystemParameters.WorkArea.Width;
@@ -103,5 +105,14 @@ namespace Desktop
             //_desktopWindow.UpdateDesktopWindow(new WindowInteropHelper(this).Handle);
         }
 
+        private void DesktopIconView_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            //MessageBox.Show("212313");
+        }
+
+        private void desktopIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+           
+        }
     }
 }

@@ -8,25 +8,57 @@
              d:DesignHeight="450" 
              d:DesignWidth="800"  
              x:Name="Root" 
-             >
+             Margin="0"
+             Padding="0"
+             BorderThickness="0">
 
-    <StackPanel Orientation="Vertical" 
-                HorizontalAlignment="Center"
-                Width="{Binding Width, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                MaxHeight="{Binding MaxHeight, RelativeSource={RelativeSource AncestorType=UserControl}}">
-
+    <StackPanel Orientation="Vertical" Margin="0">
         <Image x:Name="IconImage"
                Stretch="Uniform"
-               Height="45"
-               HorizontalAlignment="Center"
-               Margin="0,4,0,4"
-               Source="{Binding IconSource, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+               Width="43"
+               Height="43"
+               Source="{Binding IconSource, RelativeSource={RelativeSource AncestorType=UserControl}}" VerticalAlignment="Bottom"/>
 
-        <local:DesktopIconName TextContent="{Binding IconName, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        <TextBlock x:Name="textShortName" 
+                   Text="{Binding ShortName, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   Width="{Binding Width, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   Style="{StaticResource desktopFileNameStyle}" 
+                   Visibility="{Binding ShortNameVisibility,RelativeSource={RelativeSource AncestorType=UserControl}}">
+            <TextBlock.Effect>
+                <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="2" Direction="1" Opacity="1" />
+            </TextBlock.Effect>
+        </TextBlock>
+
+        <TextBlock x:Name="textFullName"
+                   Text="{Binding FullName, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   Width="{Binding Width, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   Style="{StaticResource desktopFileNameStyle}" 
+                   Visibility="{Binding FullNameVisibility,RelativeSource={RelativeSource AncestorType=UserControl}}">
+            <TextBlock.Effect>
+                <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="2" Direction="1" Opacity="1" />
+            </TextBlock.Effect>
+        </TextBlock>
+
+        <!--<TextBlock Text="{Binding ShortContent, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   Margin="0,3,0,0"
+                   TextAlignment="Center"></TextBlock>-->
+
+        <!--<TextBlock Text="{Binding FullContent}"
+                   Margin="0"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"></TextBlock>-->
+        <!--<local:DesktopIconName x:Name="desktopName"
+                               TextContent="{Binding IconName, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                Width="{Binding Width, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                TextAlignment="Center" 
                                Foreground="#fff"
-                               ></local:DesktopIconName>
-                               
+                               Margin="0,3,0,0"
+                               TextWrapping="Wrap">
+            <local:DesktopIconName.Effect>
+                <DropShadowEffect Color="Black" BlurRadius="0" ShadowDepth="1" Direction="0" Opacity="1" />
+            </local:DesktopIconName.Effect>
+
+        </local:DesktopIconName>-->
+
     </StackPanel>
 </UserControl>

@@ -17,5 +17,19 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+            <!--<Setter Property="FontFamily" Value="Segoe UI" />-->
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="{x:Static SystemFonts.MessageFontSize}" />
+        </Style>
+
+        <Style TargetType="TextBlock"  x:Key="desktopFileNameStyle">
+            <Style.Setters>
+                <Setter Property="TextAlignment" Value="Center"></Setter>
+                <Setter Property="Foreground" Value="#fff"></Setter>
+                <Setter Property="Margin" Value="0,3,0,0"></Setter>
+                <Setter Property="TextWrapping" Value="Wrap"></Setter>
+            </Style.Setters>
+        </Style>
     </Application.Resources>
 </Application>

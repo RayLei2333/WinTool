@@ -12,6 +12,9 @@ using Desktop.Manager;
 using Desktop.Win32Support;
 using Desktop.Models;
 using Desktop.Win32Support.Models;
+using System.Windows.Input;
+using Desktop.Commands;
+using System.Windows;
 
 namespace Desktop.ViewModel
 {
@@ -32,9 +35,9 @@ namespace Desktop.ViewModel
             set { _desktopFile = value; OnPropertyChanged(nameof(DesktopFile)); }
         }
 
-        public int IconWidth { get { return DesktopManager.Instence.DesktopData.IconWidth; } }
+        public double IconWidth { get { return DesktopManager.Instence.DesktopData.IconWidth; } }
 
-        public int IconHeight { get { return DesktopManager.Instence.DesktopData.IconHeight; } }
+        public double IconHeight { get { return DesktopManager.Instence.DesktopData.IconHeight; } }
 
         private BlockManager _blockManager = BlockManager.Instence;
 
@@ -42,6 +45,10 @@ namespace Desktop.ViewModel
 
         #endregion
 
+
+        #region Command
+        public ICommand DesktopFileDoubleClickCmd { get; set; }
+        #endregion
 
         public MainWindowViewModel()
         {
@@ -70,6 +77,9 @@ namespace Desktop.ViewModel
             {
                 item.Icon = IconManager.Instence.GetIcon(ViewType.Bigg, item.FullPath)?.Icon;
             }
+
+
+            DesktopFileDoubleClickCmd = new ReplayCommand<DesktopFileData>(DesktopFileDoubleClick);
         }
 
         private void SetBackground()
@@ -92,6 +102,14 @@ namespace Desktop.ViewModel
         {
             // 调整BlockItem位置
             _blockManager.Save();
+        }
+        #endregion
+
+
+        #region Command
+        private void DesktopFileDoubleClick(DesktopFileData e)
+        {
+            ProcessHelper.Run(e.FullPath);
         }
         #endregion
     }
