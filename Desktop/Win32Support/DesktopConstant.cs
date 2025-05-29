@@ -15,6 +15,8 @@
 
         //获取列表视图项的个数
         public const int LVM_GETITEMCOUNT = 0x1000 + 4;
+        public const uint LVM_GETITEMRECT = LVM_FIRST + 14;
+        public const int LVIR_BOUNDS = 0;
         //获取列表项位置
         public const int LVM_GETITEMPOSITION = 0x1000 + 16;
         //获取列表名称

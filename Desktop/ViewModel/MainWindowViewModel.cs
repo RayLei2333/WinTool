@@ -91,7 +91,10 @@ namespace Desktop.ViewModel
             else
                 BackgroundImage = new ImageBrush()
                 {
-                    ImageSource = new BitmapImage(new Uri(wallPaperPath))
+                    ImageSource = new BitmapImage(new Uri(wallPaperPath)),
+                    Stretch= Stretch.UniformToFill,
+                    AlignmentX = AlignmentX.Left,
+                    AlignmentY = AlignmentY.Top
                 };
         }
 

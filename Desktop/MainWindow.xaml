@@ -13,17 +13,13 @@
         Height="450" 
         Width="800"
         BorderThickness="0" 
-        WindowStyle="None"   
-        AllowsTransparency="True" 
+        WindowStyle="None"
         Background="{Binding BackgroundImage}"
+        AllowsTransparency="True" 
         WindowStartupLocation="CenterScreen" 
         x:Name="mainWindow"
         >
-    <!--WindowStyle="None"   AllowsTransparency="True"  Background="{Binding BackgroundImage}"-->
-    <!--<Grid x:Name="grid">-->
-    <!--<TextBlock x:Name="logs"></TextBlock>-->
-    <!--</Grid>-->
-    <!--<Button Click="Button_Click">aaa</Button>-->
+  
     <Window.Resources>
         <converts:ValueEqualsConverter x:Key="ValueEqualsConverter"></converts:ValueEqualsConverter>
     </Window.Resources>

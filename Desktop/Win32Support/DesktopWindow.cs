@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Controls;
 
 namespace Desktop.Win32Support
 {
@@ -110,6 +111,7 @@ namespace Desktop.Win32Support
                 return wallpaperPath;
             return null;
         }
+
         /// <summary>
         /// 获取桌面图标排列方式（自动排列图标、对齐到网格）
         /// </summary>
@@ -225,12 +227,38 @@ namespace Desktop.Win32Support
                 int nullIndex = title.IndexOf('\0');
                 title = nullIndex >= 0 ? title.Substring(0, nullIndex) : title;
                 Marshal.FreeHGlobal(localLvItem);
+
+                IntPtr remoteRect = Dlls.VirtualAllocEx(hProcess, IntPtr.Zero, (uint)Marshal.SizeOf<RECT>(), DesktopConstant.MEM_COMMIT, DesktopConstant.PAGE_READWRITE);
+                if (remoteRect == IntPtr.Zero)
+                    return null;
+
+                // 写入 LVIR_BOUNDS 作为结构体前4字节
+                byte[] boundsSelector = BitConverter.GetBytes(DesktopConstant.LVIR_BOUNDS);
+                Dlls.WriteProcessMemory(hProcess, remoteRect, boundsSelector, (uint)boundsSelector.Length, out _);
+
+                // 发送获取矩形请求
+                Dlls.SendMessage(listView, DesktopConstant.LVM_GETITEMRECT, i, remoteRect);
+
+                // 读取 RECT 结构体
+                IntPtr localRect = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
+                Dlls.ReadProcessMemory(hProcess, remoteRect, localRect, (uint)Marshal.SizeOf<RECT>(), out _);
+                RECT rect = Marshal.PtrToStructure<RECT>(localRect);
+
+                //Console.WriteLine($"    矩形：Left={rect.Left}, Top={rect.Top}, Right={rect.Right}, Bottom={rect.Bottom}");
+
+                Marshal.FreeHGlobal(localRect);
+                Dlls.VirtualFreeEx(hProcess, remoteRect, 0, DesktopConstant.MEM_RELEASE);
+
                 desktopIconList.Add(new DesktopFile()
                 {
                     Index = i,
                     Name = title,
                     X = x,
                     Y = y,
+                    Left = rect.Left,
+                    Top = rect.Top,
+                    Right = rect.Right,
+                    Bottom = rect.Bottom,
                 });
             }
 
@@ -249,7 +277,6 @@ namespace Desktop.Win32Support
             if (0 != nResult)
             {
                 return null;
-                //throw new ShellContextMenuException("Failed to get the desktop shell folder");
             }
             IShellFolder desktopFolder = (IShellFolder)Marshal.GetTypedObjectForIUnknown(pUnkownDesktopFolder, typeof(IShellFolder));
             // 枚举桌面图标的 PIDL
