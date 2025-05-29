@@ -19,7 +19,7 @@
         WindowStartupLocation="CenterScreen" 
         x:Name="mainWindow"
         >
-  
+
     <Window.Resources>
         <converts:ValueEqualsConverter x:Key="ValueEqualsConverter"></converts:ValueEqualsConverter>
     </Window.Resources>
@@ -27,7 +27,30 @@
     <Grid>
 
         <!--自由布局 Margin="0,2,0,2"-->
-        <ListView ItemsSource="{Binding DesktopFile}" Padding="0"  Background="Transparent" BorderThickness="0">
+        <ListView ItemsSource="{Binding DesktopFile}" Padding="0" BorderThickness="0" Background="Transparent">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Canvas.Left" Value="{Binding Left}"/>
+                    <Setter Property="Canvas.Top" Value="{Binding Top}"/>
+                    <Setter Property="Width" Value="{Binding Width}"></Setter>
+                    <Setter Property="Height" Value="{Binding Height}"></Setter>
+                    <Setter Property="BorderThickness" Value="0"></Setter>
+                    <Setter Property="Padding" Value="0"></Setter>
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <controls:DesktopIconView></controls:DesktopIconView>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ListView>
+
+        <!--<ListView ItemsSource="{Binding DesktopFile}" Padding="0"  Background="Transparent" BorderThickness="0">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas Margin="0" />
@@ -64,7 +87,7 @@
                     </controls:DesktopIconView>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ListView>
+        </ListView>-->
 
         <!--自动对齐网格-->
         <!--<ListView ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding DesktopFile}">

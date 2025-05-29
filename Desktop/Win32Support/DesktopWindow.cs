@@ -255,10 +255,10 @@ namespace Desktop.Win32Support
                     Name = title,
                     X = x,
                     Y = y,
-                    Left = rect.Left,
-                    Top = rect.Top,
-                    Right = rect.Right,
-                    Bottom = rect.Bottom,
+                    Left = (int)(rect.Left / scale),
+                    Top = (int)(rect.Top / scale),
+                    Right = (int)(rect.Right / scale),
+                    Bottom = (int)(rect.Bottom / scale),
                 });
             }
 

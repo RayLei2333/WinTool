@@ -82,8 +82,14 @@ namespace Desktop.Manager
                 DesktopData.FileData.Add(new DesktopFileData()
                 {
                     FullPath = item.FilePath,
-                    X = item.X - 3,
-                    Y = item.Y + 2,
+                    X = item.X,
+                    Y = item.Y ,
+                    Left = item.Left,
+                    Top = item.Top,
+                    Right = item.Right,
+                    Bottom = item.Bottom,
+                    Width = item.Right - item.Left,
+                    Height = item.Bottom - item.Top,
                     Seq = item.Index,
                     Name = item.Name,
                     IsFolder = Directory.Exists(item.FilePath),

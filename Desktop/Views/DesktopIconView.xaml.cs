@@ -129,50 +129,50 @@ namespace Desktop.Views
         //显示的名称转换
         public void ToShortName()
         {
-            var dpi = VisualTreeHelper.GetDpi(this);
-            var typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
-            double maxWidth = ActualWidth - textShortName.Margin.Left - textShortName.Margin.Right;
-            double lineHeight = FontSize * 1.2;
-            //能完全单行显示
-            var textSingle = CreateFormattedText(this.FullName, typeface, dpi.PixelsPerDip);
-            if (textSingle.Width <= maxWidth)
-            {
-                ShortName = this.FullName;
-                return;
-            }
+            //var dpi = VisualTreeHelper.GetDpi(this);
+            //var typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+            //double maxWidth = ActualWidth - textShortName.Margin.Left - textShortName.Margin.Right;
+            //double lineHeight = FontSize * 1.2;
+            ////能完全单行显示
+            //var textSingle = CreateFormattedText(this.FullName, typeface, dpi.PixelsPerDip);
+            //if (textSingle.Width <= maxWidth)
+            //{
+            //    ShortName = this.FullName;
+            //    return;
+            //}
 
 
-            int breakIndex = FindBreakIndex(this.FullName, typeface, maxWidth, dpi.PixelsPerDip);
-            string firstLine = this.FullName.Substring(0, breakIndex).TrimEnd();
-            string secondLine = this.FullName.Substring(breakIndex).TrimStart();
-            var ftFirst = CreateFormattedText(firstLine, typeface, dpi.PixelsPerDip);
-            var ftSecond = CreateFormattedText(secondLine, typeface, dpi.PixelsPerDip);
-            //如果分行后的第一行宽度小于最大宽度的一半  则在一行显示并追加...
-            if (ftFirst.Width < maxWidth * 0.5)
-            {
-                textShortName.Margin = new Thickness(2, textShortName.Margin.Top, 2, textShortName.Margin.Bottom);
-                //Margin = new Thickness(2, Margin.Top, 2, Margin.Bottom);
-                maxWidth = maxWidth - textShortName.Margin.Left - textShortName.Margin.Right;
-                string singleLineEllipsed = TrimWithEllipsis(this.FullName, typeface, maxWidth, dpi.PixelsPerDip);
-                var ftSingle = CreateFormattedText(singleLineEllipsed, typeface, dpi.PixelsPerDip);
-                ShortName = ftSingle.Text;
-                return;
-            }
+            //int breakIndex = FindBreakIndex(this.FullName, typeface, maxWidth, dpi.PixelsPerDip);
+            //string firstLine = this.FullName.Substring(0, breakIndex).TrimEnd();
+            //string secondLine = this.FullName.Substring(breakIndex).TrimStart();
+            //var ftFirst = CreateFormattedText(firstLine, typeface, dpi.PixelsPerDip);
+            //var ftSecond = CreateFormattedText(secondLine, typeface, dpi.PixelsPerDip);
+            ////如果分行后的第一行宽度小于最大宽度的一半  则在一行显示并追加...
+            //if (ftFirst.Width < maxWidth * 0.5)
+            //{
+            //    textShortName.Margin = new Thickness(2, textShortName.Margin.Top, 2, textShortName.Margin.Bottom);
+            //    //Margin = new Thickness(2, Margin.Top, 2, Margin.Bottom);
+            //    maxWidth = maxWidth - textShortName.Margin.Left - textShortName.Margin.Right;
+            //    string singleLineEllipsed = TrimWithEllipsis(this.FullName, typeface, maxWidth, dpi.PixelsPerDip);
+            //    var ftSingle = CreateFormattedText(singleLineEllipsed, typeface, dpi.PixelsPerDip);
+            //    ShortName = ftSingle.Text;
+            //    return;
+            //}
 
 
-            if (ftFirst.Width <= ActualWidth && ftSecond.Width <= ActualWidth)
-            {
-                // 两行完整显示
-                ShortName = $"{ftFirst.Text}\r\n{ftSecond.Text}";
-                FullName = ShortName;
-                return;
-            }
+            //if (ftFirst.Width <= ActualWidth && ftSecond.Width <= ActualWidth)
+            //{
+            //    // 两行完整显示
+            //    ShortName = $"{ftFirst.Text}\r\n{ftSecond.Text}";
+            //    FullName = ShortName;
+            //    return;
+            //}
 
-            // Step 3: 第二行加省略号
-            string secondLineEllipsed = TrimWithEllipsis(secondLine, typeface, maxWidth, dpi.PixelsPerDip);
-            var ftSecondEllipsed = CreateFormattedText(secondLineEllipsed, typeface, dpi.PixelsPerDip);
+            //// Step 3: 第二行加省略号
+            //string secondLineEllipsed = TrimWithEllipsis(secondLine, typeface, maxWidth, dpi.PixelsPerDip);
+            //var ftSecondEllipsed = CreateFormattedText(secondLineEllipsed, typeface, dpi.PixelsPerDip);
 
-            ShortName = $"{ftFirst.Text}\r\n{ftSecondEllipsed.Text}";
+            //ShortName = $"{ftFirst.Text}\r\n{ftSecondEllipsed.Text}";
         }
 
         private int FindBreakIndex(string text, Typeface typeface, double maxWidth, double dpi)
